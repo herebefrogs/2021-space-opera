@@ -6,94 +6,99 @@
 
 
 songs = [
-    // note: note magic value for piano synthesis,
+    // key: magic value of the piano key representing the note, for instrument synthesis
     // hold: duration of the note (?)
     // next: delay until the next note plays (ms)
 
   [ // Darth Vader theme
-    { note:  4, hold: 8,   next: 2000 },
-    { note:  4, hold: 8,   next: 1000 },
-    { note:  4, hold: 8,   next: 1000 },
-    { note:  0, hold: 8,   next: 1000 },
-    { note:  7, hold: 5,   next:  800 },
-    { note:  4, hold: 3.5, next:  350 },
-    { note:  0, hold: 8,   next: 1000 },
-    { note:  7, hold: 5,   next:  800 },
-    { note:  4, hold: 3.5, next:  350 },
-    { note: 11, hold: 8,   next: 2000 },
-    { note: 11, hold: 8,   next: 1000 },
-    { note: 11, hold: 8,   next: 1000 },
-    { note: 12, hold: 8,   next: 1000 },
-    { note:  7, hold: 5,   next:  800 },
-    { note:  3, hold: 3.5, next:  350 },
-    { note:  0, hold: 8,   next: 1000 },
-    { note:  7, hold: 5,   next:  800 },
-    { note:  4, hold: 3.5, next:  350 }
+    { key:  4, hold: 8,   next: 1000 },
+    { key:  4, hold: 8,   next: 1000 },
+    { key:  4, hold: 8,   next: 1000 },
+    { key:  0, hold: 8,   next:  800 },
+    { key:  7, hold: 5,   next:  350 },
+    { key:  4, hold: 3.5, next: 1000 },
+    { key:  0, hold: 8,   next:  800 },
+    { key:  7, hold: 5,   next:  350 },
+    { key:  4, hold: 3.5, next: 2000 },
+    { key: 11, hold: 8,   next: 1000 },
+    { key: 11, hold: 8,   next: 1000 },
+    { key: 11, hold: 8,   next: 1000 },
+    { key: 12, hold: 8,   next:  800 },
+    { key:  7, hold: 5,   next:  350 },
+    { key:  3, hold: 3.5, next: 1000 },
+    { key:  0, hold: 8,   next:  800 },
+    { key:  7, hold: 5,   next:  350 },
+    { key:  4, hold: 3.5, next: 2000 }
   ]
 ]
-mySong = [4,4,4,0,7,4,0,7,4,11,11,11,12,7,3,0,7,4];
-speeds =    [8,8,8,8,5,3.5,8,5,3.5,8,8,8,8,5,3.5,8,5,3.5];
-intervals = [2000,1000,1000,1000,800,350,1000,800,350,2000,1000,1000,1000,800,350,1000,800,350];
-let s = 0;  // song index
 
-var builtSong =[];
-var audioCtx = [];
+let s = 0;            // current song index
+var currentSong = []; // current song data
+
 // overlapping notes sound better when played by separate Audio Context
 const NB_AUDIO_CTX = 10;
+var audioCtx = [];
 let init = true;
 let on = true;
 let timerId;
 
 
+// add an audio buffer to each note of the song, matching the note parameters
 function buildsong(songData) {
   console.log("buildsong...");
 
-  songData.forEach((element, n) => {
-    builtSong.push( audioCtx[0].createBuffer(1, 1e6, 44100));
-    builtSong[n].getChannelData(0).set(getD(element,speeds[n]));
+  songData.forEach(note => {
+    note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
+    note.buffer.getChannelData(0).set(getD(note.key, note.hold));
   });
 }
+
+// TODO song randomization function
+// TODO song comparison function
 
 function playSong(song) {
   console.log("play song...");
   let n = 0;
   timerId = setTimeout(function run() {
-    if(n==builtSong.length){
+    // TODO I don't like n++, refactor to
+    // - play current note first
+    // - decide what should be enqueued and when
+    if (n==song.length) {
         console.log("reached end");
-        timerId = setTimeout(() => { playSong(song) }, intervals[0]);
-    }else{
-      playNote(n);
+        timerId = setTimeout(() => { playSong(song) }, song[0].next);
+    } else {
+      note = song[n];
+      playNote(n, note.buffer);
+      timerId = setTimeout(run, note.next);
       n++;
-      timerId = setTimeout(run, intervals[n]);
     }
   }, 0);
 }
 
-function playNote(n){
+function playNote(n, buffer) {
   console.log(n);
-  // rotate through the audio context
-  let j = n%NB_AUDIO_CTX;
-  source = audioCtx[j].createBufferSource();
-  source.buffer = builtSong[n];
-  source.connect(audioCtx[j].destination);
+  // rotate through the audio contexts
+  source = audioCtx[n%NB_AUDIO_CTX].createBufferSource();
+  source.buffer = buffer;
+  source.connect(audioCtx[n%NB_AUDIO_CTX].destination);
   source.start();
 }
 
 function swapNotes(i, j) {
   console.log('swap', i, '->', j);
-  let note = builtSong[i];
-  builtSong[i] = builtSong[j];
-  builtSong[j] = note;
+  let note = currentSong[i];
+  currentSong[i] = currentSong[j];
+  currentSong[j] = note;
 }
 
-const getF = i => 130.81 * 1.06 ** i;
+const getFrequency = note => 130.81 * 1.06 ** note;
 
-function getD(note, len) {
-    note = getF(note);
+function getD(note, hold) {
+    freq = getFrequency(note);
     for(
 
         // V: note length in seconds
-        V = len,
+        V = hold,
 
         // Temp vars for guitar synthesis
         vv = [],
@@ -101,11 +106,11 @@ function getD(note, len) {
         
         // Modulation
         // This function generates the i'th sample of a sinusoidal signal with a specific frequency and amplitude
-        b = (note, tt, aa, tick) => Math.sin(note / tt * 6.28 * aa + tick),
+        b = (freq, tt, aa, tick) => Math.sin(freq / tt * 6.28 * aa + tick),
         
         // Piano synthesis
-        w = (note, tt) =>
-           Math.sin(note / 44100 * tt * 6.28 + b(note, 44100, tt, 0) ** 2 + .75 * b(note, 44100, tt, .25) + .1 * b(note, 44100, tt, .5)),
+        w = (freq, tt) =>
+           Math.sin(freq / 44100 * tt * 6.28 + b(freq, 44100, tt, 0) ** 2 + .75 * b(freq, 44100, tt, .25) + .1 * b(freq, 44100, tt, .5)),
         D = [],
         
         // Loop on all the samples
@@ -119,10 +124,10 @@ function getD(note, len) {
         
           // The first 88 samples represent the note's attack
           tick < 88 
-          ? tick / 88.2 * w(tick, note) 
+          ? tick / 88.2 * w(tick, freq) 
           
           // The other samples represent the rest of the note
-          : (1 - (tick - 88.2) / (44100 * (V - .002))) ** ((.5 * Math.log(1e4 * note / 44100)) ** 2) * w(tick, note);
+          : (1 - (tick - 88.2) / (44100 * (V - .002))) ** ((.5 * Math.log(1e4 * freq / 44100)) ** 2) * w(tick, freq);
         }
         return D;
 }
@@ -136,7 +141,7 @@ onclick = () => {
     context = performance.now();
     
     // build the song
-    buildsong(mySong);
+    buildsong(songs[s]);
     end = performance.now();
     
     console.log('audio context ' + (context-start)/1000 + 's', 'build song ' + (end - context)/1000 + 's', 'total ' + (end - start)/ 1000 + 's')    
@@ -144,8 +149,12 @@ onclick = () => {
   }
 
   if (on) {
+    // make a shallow clone of the current song, that can be altered to recompose the original song
+    currentSong = songs[s].map(note => note);
+    // TODO randomize the song
+
     // play the song
-    playSong(builtSong);
+    playSong(currentSong);
   } else {
     clearTimeout(timerId);
   }
@@ -153,6 +162,7 @@ onclick = () => {
 }
 
 onkeyup = e => {
+  // TODO this is temporary until the swaps are intentional rather then random
   i = e.key;
   let j;
 
