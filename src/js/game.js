@@ -47,41 +47,48 @@ let timerId;
 
 function buildsong(songData) {
   console.log("buildsong...");
+
   songData.forEach((element, n) => {
-    builtSong.push( audioCtx[n%NB_AUDIO_CTX].createBuffer(1, 1e6, 44100));
+    builtSong.push( audioCtx[0].createBuffer(1, 1e6, 44100));
     builtSong[n].getChannelData(0).set(getD(element,speeds[n]));
   });
 }
 
-function playTheSong(song) {
+function playSong(song) {
   console.log("play song...");
   let n = 0;
   timerId = setTimeout(function run() {
     if(n==builtSong.length){
         console.log("reached end");
-        timerId = setTimeout(() => {
-          playTheSong(song)
-        }, intervals[0]);
+        timerId = setTimeout(() => { playSong(song) }, intervals[0]);
     }else{
-      playTheNote(n);
+      playNote(n);
       n++;
       timerId = setTimeout(run, intervals[n]);
     }
   }, 0);
 }
 
-function playTheNote(note){
-  console.log(note);
-  j = note%NB_AUDIO_CTX;
+function playNote(n){
+  console.log(n);
+  // rotate through the audio context
+  let j = n%NB_AUDIO_CTX;
   source = audioCtx[j].createBufferSource();
-  source.buffer = builtSong[note];
+  source.buffer = builtSong[n];
   source.connect(audioCtx[j].destination);
   source.start();
 }
 
-function getF(i){ return 130.81 * 1.06 ** i;}
+function swapNotes(i, j) {
+  console.log('swap', i, '->', j);
+  let note = builtSong[i];
+  builtSong[i] = builtSong[j];
+  builtSong[j] = note;
+}
 
-function getD(note, len){
+const getF = i => 130.81 * 1.06 ** i;
+
+function getD(note, len) {
     note = getF(note);
     for(
 
@@ -120,13 +127,6 @@ function getD(note, len){
         return D;
 }
 
-//How to use in game: Either play a whole song as an array
-// ex: mySong = [1,1,1,2,2,3,3,4,28,25,28,23,25,24,21,21,21];
-// Use buildSong(song, piano); and playTheSong(builtsong);
-// or/and play individual notes
-// ex: playNote(getF(32),3,false);
-// To use in onClick:
-
 onclick = () => {
   if (init) {
     start = performance.now();
@@ -145,9 +145,20 @@ onclick = () => {
 
   if (on) {
     // play the song
-    playTheSong(builtSong);
+    playSong(builtSong);
   } else {
     clearTimeout(timerId);
   }
   on = !on;
+}
+
+onkeyup = e => {
+  i = e.key;
+  let j;
+
+  do {
+    j = Math.floor(Math.random() * songs[s].length);
+  } while (j == i);
+
+  swapNotes(i, j);
 }
