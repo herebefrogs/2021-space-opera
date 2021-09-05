@@ -38,7 +38,7 @@ var currentSong = []; // current song data
 // overlapping notes sound better when played by separate Audio Context
 const NB_AUDIO_CTX = 10;
 var audioCtx = [];
-let init = true;
+const memoNoteToData = {};  // cache computation expensive audio data, indexed by note + hold
 let on = true;
 let timerId;
 
@@ -94,6 +94,11 @@ function swapNotes(i, j) {
 const getFrequency = note => 130.81 * 1.06 ** note;
 
 function getD(note, hold) {
+    const memoKey = `${note}-${hold}`;
+    if (memoNoteToData[memoKey]) {
+      return memoNoteToData[memoKey];
+    }
+
     freq = getFrequency(note);
     for(
 
@@ -129,25 +134,27 @@ function getD(note, hold) {
           // The other samples represent the rest of the note
           : (1 - (tick - 88.2) / (44100 * (V - .002))) ** ((.5 * Math.log(1e4 * freq / 44100)) ** 2) * w(tick, freq);
         }
+
+        memoNoteToData[memoKey] = D;
         return D;
 }
 
-onclick = () => {
-  if (init) {
-    start = performance.now();
-    for(i=0; i<NB_AUDIO_CTX;i++){
-      audioCtx[i]= new AudioContext;
-    }
-    context = performance.now();
-    
-    // build the song
-    buildsong(songs[s]);
-    end = performance.now();
-    
-    console.log('audio context ' + (context-start)/1000 + 's', 'build song ' + (end - context)/1000 + 's', 'total ' + (end - start)/ 1000 + 's')    
-    init = false;
+function init() {
+  start = performance.now();
+  for(i=0; i<NB_AUDIO_CTX;i++){
+    audioCtx[i]= new AudioContext;
   }
+  context = performance.now();
+  
+  // build the song
+  buildsong(songs[s]);
+  end = performance.now();
 
+  console.log('audio context ' + (context-start)/1000 + 's', 'build song ' + (end - context)/1000 + 's', 'total ' + (end - start)/ 1000 + 's')    
+
+}
+
+onclick = () => {
   if (on) {
     // make a shallow clone of the current song, that can be altered to recompose the original song
     currentSong = songs[s].map(note => note);
@@ -172,3 +179,5 @@ onkeyup = e => {
 
   swapNotes(i, j);
 }
+
+init();
