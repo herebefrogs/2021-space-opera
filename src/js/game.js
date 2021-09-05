@@ -4,46 +4,75 @@
 // https://xem.github.io/js1k19/miniSynth/
 //***PIANO****
 
+
+songs = [
+    // note: note magic value for piano synthesis,
+    // hold: duration of the note (?)
+    // next: delay until the next note plays (ms)
+
+  [ // Darth Vader theme
+    { note:  4, hold: 8,   next: 2000 },
+    { note:  4, hold: 8,   next: 1000 },
+    { note:  4, hold: 8,   next: 1000 },
+    { note:  0, hold: 8,   next: 1000 },
+    { note:  7, hold: 5,   next:  800 },
+    { note:  4, hold: 3.5, next:  350 },
+    { note:  0, hold: 8,   next: 1000 },
+    { note:  7, hold: 5,   next:  800 },
+    { note:  4, hold: 3.5, next:  350 },
+    { note: 11, hold: 8,   next: 2000 },
+    { note: 11, hold: 8,   next: 1000 },
+    { note: 11, hold: 8,   next: 1000 },
+    { note: 12, hold: 8,   next: 1000 },
+    { note:  7, hold: 5,   next:  800 },
+    { note:  3, hold: 3.5, next:  350 },
+    { note:  0, hold: 8,   next: 1000 },
+    { note:  7, hold: 5,   next:  800 },
+    { note:  4, hold: 3.5, next:  350 }
+  ]
+]
 mySong = [4,4,4,0,7,4,0,7,4,11,11,11,12,7,3,0,7,4];
-speeds =    [1000,1000,1000,1000,800,350,1000,800,350,1000,1000,1000,1000,800,350,1000,800,350];
+speeds =    [8,8,8,8,5,3.5,8,5,3.5,8,8,8,8,5,3.5,8,5,3.5];
 intervals = [2000,1000,1000,1000,800,350,1000,800,350,2000,1000,1000,1000,800,350,1000,800,350];
+let s = 0;  // song index
+
 var builtSong =[];
 var audioCtx = [];
+// overlapping notes sound better when played by separate Audio Context
+const NB_AUDIO_CTX = 10;
+let init = true;
+let on = true;
+let timerId;
 
 
-
-function buildsong(mySong){
-  let i =0;
-  let j;
+function buildsong(songData) {
   console.log("buildsong...");
-  mySong.forEach((element, n) => {
-          j=i%10;
-          builtSong.push( audioCtx[j].createBuffer(1, 1e6, 44100));
-          builtSong[i].getChannelData(0).set(getD(element,speeds[n]/100));
-          i++;
+  songData.forEach((element, n) => {
+    builtSong.push( audioCtx[n%NB_AUDIO_CTX].createBuffer(1, 1e6, 44100));
+    builtSong[n].getChannelData(0).set(getD(element,speeds[n]));
   });
 }
 
 function playTheSong(song) {
   console.log("play song...");
   let n = 0;
-  setTimeout(function run() {
+  timerId = setTimeout(function run() {
     if(n==builtSong.length){
         console.log("reached end");
-        setTimeout(() => {
+        timerId = setTimeout(() => {
           playTheSong(song)
         }, intervals[0]);
     }else{
-      console.log(n);
       playTheNote(n);
       n++;
-      setTimeout(run, intervals[n]);
+      timerId = setTimeout(run, intervals[n]);
     }
   }, 0);
 }
 
 function playTheNote(note){
-  j = note%10;
+  console.log(note);
+  j = note%NB_AUDIO_CTX;
   source = audioCtx[j].createBufferSource();
   source.buffer = builtSong[note];
   source.connect(audioCtx[j].destination);
@@ -97,22 +126,28 @@ function getD(note, len){
 // or/and play individual notes
 // ex: playNote(getF(32),3,false);
 // To use in onClick:
+
 onclick = () => {
-    for(i=0;i<11;i++){
+  if (init) {
+    start = performance.now();
+    for(i=0; i<NB_AUDIO_CTX;i++){
       audioCtx[i]= new AudioContext;
     }
-    var singleNote = audioCtx[10].createBuffer(1, 1e6, 44100);
-    singleNote.getChannelData(0).set(getD(32,3,false));
+    context = performance.now();
+    
     // build the song
-    buildsong(mySong,false);
+    buildsong(mySong);
+    end = performance.now();
+    
+    console.log('audio context ' + (context-start)/1000 + 's', 'build song ' + (end - context)/1000 + 's', 'total ' + (end - start)/ 1000 + 's')    
+    init = false;
+  }
 
+  if (on) {
     // play the song
     playTheSong(builtSong);
-}
-
-function playOneNote(note){
-    source = audioCtx[10].createBufferSource();
-    source.buffer = note;
-    source.connect(audioCtx[10].destination);
-    source.start();
+  } else {
+    clearTimeout(timerId);
+  }
+  on = !on;
 }
