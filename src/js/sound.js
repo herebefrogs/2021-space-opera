@@ -54,24 +54,19 @@ export function stopSong(song) {
   });
 }
 
-export function swapNotesInSong(i, j, song) {
-  let note = song[i];
-  song[i] = song[j];
-  song[j] = note;
-}
-
 // private implementation
 
 // add an audio buffer to each note of the song, matching the note parameters
 function generateBufferDataForSong(songData) {
-  songData.forEach(note => {
+  songData.forEach((note, n) => {
+    note.id = n;
     note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
     note.buffer.getChannelData(0).set(getD(note.key, note.hold));
   });
 }
 
 function playNote(n, note) {
-  console.log(n);
+  console.log(n, note.id);
   // rotate through the audio contexts
   source = audioCtx[n%NB_AUDIO_CTX].createBufferSource();
   source.buffer = note.buffer;
