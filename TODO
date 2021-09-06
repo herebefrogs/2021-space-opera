@@ -4,9 +4,9 @@ game feature
 ============
 - puzzle logic
 [sunday]
-  - randomize current song's notes on puzzle start
   - basic UI to render notes as rings
     - glow effect while a note is playing
+  - randomize current song's notes on puzzle start
 [monday]
   - rings drag & drop
     - leads to start and end notes swap
