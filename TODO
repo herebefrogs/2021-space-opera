@@ -5,9 +5,10 @@ game feature
 - puzzle logic
 [sunday]
   - [x] basic UI to render notes as rings
-    - glow effect while a note is playing
+    - [x] glow effect while a note is playing
 [monday]
   - randomize current song's notes on puzzle start
+  - larger rings and trail so drag & drop is easier
   - rings drag & drop
     - [x] leads to start and end notes swap
     - mobile friendly controls
@@ -20,7 +21,7 @@ game feature
 [wednesday/thursday]
   - more tunes
     - star trek theme (short/easy)
-    - star wars force (short/easy)
+    - [x] star wars force (short/easy)
     - lost in Space
     - battle star galactica
     - what else?

@@ -37,7 +37,7 @@ export function playSong(song) {
         timerId = setTimeout(() => { playSong(song) }, song[0].next);
     } else {
       note = song[n];
-      playNote(n, note);
+      playNote(note, n);
       timerId = setTimeout(run, note.next);
       n++;
     }
@@ -65,14 +65,15 @@ function generateBufferDataForSong(songData) {
   });
 }
 
-function playNote(n, note) {
-  console.log(n, note.id);
+function playNote(note, n) {
+  console.log('current:', n, 'real:', note.id);
   // rotate through the audio contexts
   source = audioCtx[n%NB_AUDIO_CTX].createBufferSource();
   source.buffer = note.buffer;
   source.connect(audioCtx[n%NB_AUDIO_CTX].destination);
   source.start();
   note.source = source;
+  note.startTime = performance.now();
 }
 
 const getFrequency = note => 130.81 * 1.06 ** note;

@@ -22,7 +22,28 @@ const SONGS = [
   // hold: duration of the note (?)
   // next: delay until the next note plays (ms)
 
-  [ // Darth Vader theme (9 notes - 18 extended)
+  // 2001 a space odyssey (5 notes)
+  // [
+  //   key: 9,16,21,25,24
+  // ],
+  // the Force theme (7 notes)
+  [
+    { key: 12, hold: 3.5, next:  350 },
+    { key: 17, hold: 8,   next: 1000 },
+    { key: 19, hold: 8,   next: 1000 },
+    { key: 20, hold: 2.5, next:  250 },
+    { key: 22, hold: 2.5, next:  250 },
+    { key: 20, hold: 8,   next:  800 },
+    { key: 12, hold: 8,   next: 2000 }
+  ],
+  // Lost in space (7 notes)
+  // https://www.youtube.com/watch?v=--5Z-gwwzzw
+  // Star Trek theme (8 notes)
+  // [
+  //   keys: 11,16,21,20,16,13,18,23
+  // ],
+  // Darth Vader theme (9 notes - 18 extended)
+  [
     { key:  4, hold: 8,   next: 1000 },
     { key:  4, hold: 8,   next: 1000 },
     { key:  4, hold: 8,   next: 1000 },
@@ -31,7 +52,7 @@ const SONGS = [
     { key:  4, hold: 3.5, next: 1000 },
     { key:  0, hold: 8,   next:  800 },
     { key:  7, hold: 5,   next:  350 },
-    { key:  4, hold: 3.5, next: 2000 },
+    { key:  4, hold: 3.5, next: 2000 }
     // { key: 11, hold: 8,   next: 1000 },
     // { key: 11, hold: 8,   next: 1000 },
     // { key: 11, hold: 8,   next: 1000 },
@@ -85,9 +106,10 @@ let running = true;
 
 // GAMEPLAY HANDLERS
 
-// TODO do better than this, leave some room for glow
-// map key [0-22] to hue
-const keyToColor = key => `#${key}${key}${key}`;
+// map key [0-35] to hue [0-360]
+const keyToHue = key => key*10;
+
+const entityColor = note => `hsl(${note.hue} 50% ${lerp(90, 50, (currentTime - note.startTime)/note.next)}%)`;
 
 
 function startGame() {
@@ -97,9 +119,9 @@ function startGame() {
   currentSong = SONGS[s].map(note => ({...note}));
   // TODO randomize the song
 
-  // HACK: notes will be used as entities
   updateNotesDisplatyAttributes();
-
+  
+  // HACK: notes will be used as entities
   entities = [
     ...currentSong
     // TODO add planet
@@ -121,9 +143,10 @@ function updateNotesDisplatyAttributes() {
   currentSong.reduceRight(
     (currentRadius, note) => {
       // set some rendering
-      note.color = keyToColor(note.key);
+      note.hue = keyToHue(note.key);
       note.radius = currentRadius + note.next/100;
       note.width = note.hold;
+      note.startTime = 0;
 
       return note.radius;
     },
@@ -135,20 +158,15 @@ function swapRings(src, dest) {
   let srcNote = currentSong[src];
   let destNote = currentSong[dest];
 
-  // swap notes radius
-  // FIXME this breaks havoc on other radiuses, as theydon't lign up anymore...
-  // either:
-  // - recalculate all the radiuses, but that's gonna lead to jarring
-  // - only swap the note frequency (key and buffer) so the song rhythm is preserved
-  //  (but then how to I check that the song has been reconstituted?
-  //  (id vs position ain't enough anymore... key at position vs key in template at position?)
-  // let srcRadius = srcNote.radius;
-  // srcNote.radius = destNote.radius;
-  // destNote.radius = srcRadius;
-  // swap notes position
+  // swap notes
   currentSong[src] = destNote;
   currentSong[dest] = srcNote;
 
+  // TODO either:
+  // - [x] recalculate all the radiuses, but that's gonna lead to jarring
+  // - [ ] only swap the note frequency (key and buffer) so the song rhythm is preserved
+  //  (but then how to I check that the song has been reconstituted?
+  //  (id vs position ain't enough anymore... key at position vs key in template at position?)
   updateNotesDisplatyAttributes();
   updateWellPlacedNotes();
 }
@@ -239,7 +257,7 @@ function render() {
       entities.forEach(entity => renderEntity(entity));
       renderBitmapText(
         `harmonious notes: ${wellPlacedNotes}/${currentSong.length}`,
-        VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT
+        VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT, 2
       );
       renderCrosshair();
       break;
@@ -259,7 +277,7 @@ function renderCrosshair() {
 
 function renderEntity(entity, ctx = VIEWPORT_CTX) {
   ctx.save();
-  ctx.strokeStyle = entity.color;
+  ctx.strokeStyle = entityColor(entity);
   ctx.lineWidth = entity.width;
   ctx.beginPath();
   ctx.arc(VIEWPORT.width / 2, VIEWPORT.height, entity.radius, 0, 2 * Math.PI);
