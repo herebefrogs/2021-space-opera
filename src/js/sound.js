@@ -68,9 +68,13 @@ function generateBufferDataForSong(songData) {
 function playNote(note, n) {
   console.log('current:', n, 'real:', note.id);
   // rotate through the audio contexts
-  source = audioCtx[n%NB_AUDIO_CTX].createBufferSource();
+  const aCtx = audioCtx[n%NB_AUDIO_CTX];
+  const source = aCtx.createBufferSource();
   source.buffer = note.buffer;
-  source.connect(audioCtx[n%NB_AUDIO_CTX].destination);
+  const gain = aCtx.createGain();
+  gain.gain.value = 0.3;
+  source.connect(gain);
+  gain.connect(aCtx.destination);
   source.start();
   note.source = source;
   note.startTime = performance.now();

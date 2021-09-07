@@ -109,7 +109,8 @@ let running = true;
 // map key [0-35] to hue [0-360]
 const keyToHue = key => key*10;
 
-const entityColor = note => `hsl(${note.hue} 50% ${lerp(90, 50, (currentTime - note.startTime)/note.next)}%)`;
+const mainColor = note => `hsl(${note.hue} 80% ${lerp(90, 50, (currentTime - note.startTime)/note.next)}%)`;
+const trailColor = note => `hsl(${note.hue} 10% 10%)`;
 
 
 function startGame() {
@@ -119,7 +120,7 @@ function startGame() {
   currentSong = SONGS[s].map(note => ({...note}));
   // TODO randomize the song
 
-  updateNotesDisplatyAttributes();
+  updateNotesDisplayAttributes();
   
   // HACK: notes will be used as entities
   entities = [
@@ -138,13 +139,13 @@ function startGame() {
   screen = GAME_SCREEN;
 };
 
-function updateNotesDisplatyAttributes() {
+function updateNotesDisplayAttributes() {
   // use reduceRight like a right-to-left forEach
   currentSong.reduceRight(
     (currentRadius, note) => {
       // set some rendering
       note.hue = keyToHue(note.key);
-      note.radius = currentRadius + note.next/100;
+      note.radius = currentRadius + 2*note.hold + note.next/100;
       note.width = note.hold;
       note.startTime = 0;
 
@@ -167,7 +168,7 @@ function swapRings(src, dest) {
   // - [ ] only swap the note frequency (key and buffer) so the song rhythm is preserved
   //  (but then how to I check that the song has been reconstituted?
   //  (id vs position ain't enough anymore... key at position vs key in template at position?)
-  updateNotesDisplatyAttributes();
+  updateNotesDisplayAttributes();
   updateWellPlacedNotes();
 }
 
@@ -277,12 +278,25 @@ function renderCrosshair() {
 
 function renderEntity(entity, ctx = VIEWPORT_CTX) {
   ctx.save();
-  ctx.strokeStyle = entityColor(entity);
+  ctx.shadowBlur = 15;
   ctx.lineWidth = entity.width;
+  
+  // trail (not sure if keeping it)
   ctx.beginPath();
-  ctx.arc(VIEWPORT.width / 2, VIEWPORT.height, entity.radius, 0, 2 * Math.PI);
+  ctx.arc(VIEWPORT.width / 2, VIEWPORT.height, entity.radius-2*entity.hold, 0, 2 * Math.PI);
+  ctx.strokeStyle = trailColor(entity);
+  ctx.shadowColor = ctx.strokeStyle;
   ctx.stroke();
   ctx.closePath();
+
+  // ring
+  ctx.beginPath();
+  ctx.arc(VIEWPORT.width / 2, VIEWPORT.height, entity.radius, 0, 2 * Math.PI);
+  ctx.strokeStyle = mainColor(entity);
+  ctx.shadowColor = ctx.strokeStyle;
+  ctx.stroke();
+  ctx.closePath();
+  
   ctx.restore();
 };
 
