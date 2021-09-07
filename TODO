@@ -15,16 +15,20 @@ game feature
   - [x] compare current song's notes to original on each ring reordered
     - if notes matches, move on to next puzzle
 [tuesday]
-  - nicer UI to render rings and planets
+  - nicer UI to render rings
+    - planets
+    - star field
   - ask for feedback
 - puzzles
 [wednesday/thursday]
   - more tunes
     - star trek theme (short/easy)
+    - star trek TNG theme?
     - [x] star wars force (short/easy)
     - lost in Space
     - battle star galactica
-    - what else?
+    - alien
+    - galaxy quest
 [friday]
 - coil
   - if monetization, drop a hint about the song
@@ -35,6 +39,7 @@ game feature
   - tweet? number of ring moved?
 [sunday]
 - screenshots
+- update README & repo
 - submit
 
 

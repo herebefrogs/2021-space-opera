@@ -65,15 +65,14 @@ const SONGS = [
   ]
 ];
 
-const BASE_RADIUS = 50;
-let s = 0;            // current song index
+const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between crosshair and ring
+const BASE_RADIUS = 50; // in pixel, inner space for planet
+const HUE_HOVER = 300;  // Purple HSL hue in degree, when crosshair over a ring
+let s;            // current song index
 var currentSong = []; // current song data
 
-// DELETE ME
-let on = true;
 
-
-
+const planet = {};
 let crosshair; // coordinate in viewport space (add viewportOffset to convert to map space)
 let entities;
 let wellPlacedNotes;
@@ -93,9 +92,6 @@ let canvasX;
 let scaleToFit;
 
 
-const DISTANCE_TO_TARGET_RANGE = 5; // in pixel
-
-
 // LOOP VARIABLES
 
 let currentTime;
@@ -106,16 +102,20 @@ let running = true;
 
 // GAMEPLAY HANDLERS
 
-// map key [0-35] to hue [0-360]
+// map piano key [0-35] to hue [0-360] in degree
 const keyToHue = key => key*10;
 
-const mainColor = note => `hsl(${note.hue} 80% ${lerp(90, 50, (currentTime - note.startTime)/note.next)}%)`;
+const mainColor = note => `hsl(${note.hover ? HUE_HOVER : note.hue} 90% ${lerp(90, 50, (currentTime - note.startTime)/note.next)}%)`;
 const trailColor = note => `hsl(${note.hue} 10% 10%)`;
 
 
 function startGame() {
   // setRandSeed(getRandSeed());
   konamiIndex = 0;
+  s = 0;
+  planet.x = VIEWPORT.width / 2;
+  planet.y = VIEWPORT.height;
+
   // clone the current song, that can altered at will without damaging the original template
   currentSong = SONGS[s].map(note => ({...note}));
   // TODO randomize the song
@@ -127,16 +127,18 @@ function startGame() {
     ...currentSong
     // TODO add planet
   ]
+  crosshair = {
+    x: planet.x,
+    y: planet.y / 2
+  };
 
   updateWellPlacedNotes();
 
-  crosshair = {
-    view: { x: VIEWPORT.width / 2, y: VIEWPORT.height / 2 },
-    map: {}
-  };
   renderMap();
   
   screen = GAME_SCREEN;
+
+  playSong(currentSong);     
 };
 
 function updateNotesDisplayAttributes() {
@@ -158,6 +160,7 @@ function updateNotesDisplayAttributes() {
 function swapRings(src, dest) {
   let srcNote = currentSong[src];
   let destNote = currentSong[dest];
+  console.log(src, srcNote.id, '->', dest, destNote.id);
 
   // swap notes
   currentSong[src] = destNote;
@@ -165,6 +168,7 @@ function swapRings(src, dest) {
 
   // TODO either:
   // - [x] recalculate all the radiuses, but that's gonna lead to jarring
+  //   AND THIS IS WEIRD INDEED
   // - [ ] only swap the note frequency (key and buffer) so the song rhythm is preserved
   //  (but then how to I check that the song has been reconstituted?
   //  (id vs position ain't enough anymore... key at position vs key in template at position?)
@@ -179,42 +183,23 @@ function updateWellPlacedNotes() {
     0
   );
 }
-function updateCrosshairMapPosition() {
-  crosshair.x = Math.round(crosshair.view.x);
-  crosshair.y = Math.round(crosshair.view.y);
-}
 
-function updateEntityPosition(entity) {
-  // const ratio = entity.velX && entity.velY ? DIAGONAL_VELOCITY_DRAG : 1;
-  // const distance = entity.speed * elapsedTime * ratio;
-  // entity.x += distance * entity.velX;
-  // entity.y += distance * entity.velY;
-}
+function ringUnderCrosshair() {
+  const crosshairDistanceFromPlanet = Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
-function withinDestinationRange(entity) {
-  return Math.sqrt(Math.pow(entity.destX - entity.x, 2) + Math.pow(entity.destY - entity.y, 2)) <= DISTANCE_TO_TARGET_RANGE;
-}
-
-
-function updateEntityCounters(entity) {
-  switch (entity.type) {
-    case 'hero':
-      break;
-  }
-};
-
-function updateEntity(entity) {
-  updateEntityPosition(entity);
-  updateEntityCounters(entity);
+  return currentSong.find(note => Math.abs(note.radius - crosshairDistanceFromPlanet) <= DISTANCE_TO_TARGET_RANGE);
 }
 
 function update() {
   switch (screen) {
     case GAME_SCREEN:
+      currentSong.forEach(note => { note.hover = 0 });
 
-      entities.forEach(updateEntity);
-      updateCrosshairMapPosition();
-      entities = entities.filter(entity => !entity.dead);
+      const note = ringUnderCrosshair()
+      if (note && !note.dragged) {
+        note.hover = currentTime;
+      }
+      
       break;
   }
 };
@@ -257,7 +242,11 @@ function render() {
       );
       entities.forEach(entity => renderEntity(entity));
       renderBitmapText(
-        `harmonious notes: ${wellPlacedNotes}/${currentSong.length}`,
+        `planets: ${s + 1}/${SONGS.length}`,
+        CHARSET_SIZE, CHARSET_SIZE, ALIGN_LEFT, 2
+      );
+      renderBitmapText(
+        `notes: ${wellPlacedNotes}/${currentSong.length}`,
         VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT, 2
       );
       renderCrosshair();
@@ -270,10 +259,11 @@ function render() {
 };
 
 function renderCrosshair() {
+  // should be a hand
   VIEWPORT_CTX.strokeStyle = '#fff';
   VIEWPORT_CTX.lineWidth = 2;
-  VIEWPORT_CTX.strokeRect(crosshair.view.x - 1, crosshair.view.y - 1, 2, 2);
-  VIEWPORT_CTX.strokeRect(crosshair.view.x - 6, crosshair.view.y - 6, 12, 12);
+  VIEWPORT_CTX.strokeRect(crosshair.x - 1, crosshair.y - 1, 2, 2);
+  VIEWPORT_CTX.strokeRect(crosshair.x - 6, crosshair.y - 6, 12, 12);
 }
 
 function renderEntity(entity, ctx = VIEWPORT_CTX) {
@@ -283,7 +273,7 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
   
   // trail (not sure if keeping it)
   ctx.beginPath();
-  ctx.arc(VIEWPORT.width / 2, VIEWPORT.height, entity.radius-2*entity.hold, 0, 2 * Math.PI);
+  ctx.arc(planet.x, planet.y, entity.radius-2*entity.hold, 0, 2 * Math.PI);
   ctx.strokeStyle = trailColor(entity);
   ctx.shadowColor = ctx.strokeStyle;
   ctx.stroke();
@@ -291,7 +281,7 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 
   // ring
   ctx.beginPath();
-  ctx.arc(VIEWPORT.width / 2, VIEWPORT.height, entity.radius, 0, 2 * Math.PI);
+  ctx.arc(planet.x, planet.y, entity.radius, 0, 2 * Math.PI);
   ctx.strokeStyle = mainColor(entity);
   ctx.shadowColor = ctx.strokeStyle;
   ctx.stroke();
@@ -398,27 +388,6 @@ onkeyup = function(e) {
       }
       break;
     case GAME_SCREEN:
-      switch (e.code) {
-        case 'Digit0':
-        case 'Digit1':
-        case 'Digit2':
-        case 'Digit3':
-        case 'Digit4':
-        case 'Digit5':
-        case 'Digit6':
-        case 'Digit7':
-        case 'Digit8':
-        case 'Digit9':
-          let i = e.key;
-          let j;
-        
-          do {
-            j = Math.floor(Math.random() * currentSong.length);
-          } while (j == i);
-        
-          swapRings(i, j);
-          break;
-        }
       break;
     case END_SCREEN:
       switch (e.code) {
@@ -443,12 +412,13 @@ onpointerdown = function(e) {
   switch (screen) {
     case GAME_SCREEN:
       crosshair.touchTime = currentTime;
-      if (on) {
-        playSong(currentSong);
-      } else {
-        stopSong(currentSong);
+
+      // TODO should I recalculate the touch position?
+
+      const note = ringUnderCrosshair();
+      if (note) {
+        note.dragged = crosshair.touchTime;
       }
-      on = !on;
       break;
   }
 };
@@ -458,8 +428,8 @@ onpointermove = function(e) {
   switch (screen) {
     case GAME_SCREEN:
       const [touchX, touchY] = pointerLocation(e);
-      crosshair.view.x = touchX;
-      crosshair.view.y = touchY;
+      crosshair.x = touchX;
+      crosshair.y = touchY;
       break;
   }
 }
@@ -472,6 +442,18 @@ onpointerup = function(e) {
       break;
     case GAME_SCREEN:
       crosshair.touchTime = 0;
+
+      const srcNote = currentSong.find(note => note.dragged);
+      srcNote.dragged = 0;
+      const destNote = ringUnderCrosshair();
+      if (destNote) {
+        // TODO it's shitty I need to find the index despite having the note
+        // and swapRings is gonna look for the note from the index...
+        // maybe ringUnderCrosshair should return an ID instead?
+        const srcIndex = currentSong.findIndex(note => note.id === srcNote.id);
+        const destIndex = currentSong.findIndex(note => note.id === destNote.id);
+        swapRings(srcIndex, destIndex);
+      }
       break;
     case END_SCREEN:
       screen = TITLE_SCREEN;
