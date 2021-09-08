@@ -129,8 +129,8 @@ function startGame() {
     // TODO add planet
   ]
   crosshair = {
-    x: planet.x,
-    y: planet.y / 2
+    x: -10,
+    y: -10
   };
 
   updateWellPlacedNotes();
@@ -178,7 +178,7 @@ function updateWellPlacedNotes() {
 function ringUnderCrosshair() {
   const crosshairDistanceFromPlanet = Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
-  return currentSong.find(note => Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE));
+  return currentSong.findIndex(note => Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE));
 }
 
 function update() {
@@ -186,9 +186,9 @@ function update() {
     case GAME_SCREEN:
       currentSong.forEach(note => { note.hover = 0 });
 
-      const note = ringUnderCrosshair()
-      if (note && !note.dragged) {
-        note.hover = currentTime;
+      const n = ringUnderCrosshair()
+      if (n >= 0 && !currentSong[n].dragged) {
+        currentSong[n].hover = currentTime;
       }
       
       break;
@@ -407,9 +407,9 @@ onpointerdown = function(e) {
 
       // TODO should I recalculate the touch position?
 
-      const note = ringUnderCrosshair();
-      if (note) {
-        note.dragged = crosshair.touchTime;
+      const n = ringUnderCrosshair();
+      if (n >= 0) {
+        currentSong[n].dragged = crosshair.touchTime;
       }
       break;
   }
@@ -435,18 +435,13 @@ onpointerup = function(e) {
     case GAME_SCREEN:
       crosshair.touchTime = 0;
 
-      const srcNote = currentSong.find(note => note.dragged);
-      if (srcNote) {
-        srcNote.dragged = 0;
+      const src = currentSong.findIndex(note => note.dragged);
+      if (src >= 0) {
+        currentSong[src].dragged = 0;
       }
-      const destNote = ringUnderCrosshair();
-      if (destNote) {
-        // TODO it's shitty I need to find the index despite having the note
-        // and srcNote is gonna look for the note from the index...
-        // maybe ringUnderCrosshair should return an ID instead?
-        const srcIndex = currentSong.findIndex(note => note.id === srcNote.id);
-        const destIndex = currentSong.findIndex(note => note.id === destNote.id);
-        moveRing(srcIndex, destIndex);
+      const dest = ringUnderCrosshair();
+      if (dest >= 0) {
+        moveRing(src, dest);
       }
       break;
     case END_SCREEN:
