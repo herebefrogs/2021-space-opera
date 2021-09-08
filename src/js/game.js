@@ -17,25 +17,37 @@ const END_SCREEN = 2;
 let screen = TITLE_SCREEN;
 
 
-const SONGS = [
-  // key: magic value of the piano key representing the note, for instrument synthesis
-  // hold: duration of the note (?)
-  // next: delay until the next note plays (ms)
+const PLANETS = [
+  // format
+  // {
+  //   name: song name
+  //   song: [
+  //     {
+  //       key: magic value of the piano key representing the note, for instrument synthesis
+  //       hold: duration of the note (?)
+  //       next: delay until the next note plays (ms)
+  //     }
+  //     ...
+  //   ]
+  // }
 
   // 2001 a space odyssey (5 notes)
   // [
   //   key: 9,16,21,25,24
   // ],
   // the Force theme (7 notes)
-  [
-    { key: 12, hold: 3.5, next:  350 },
-    { key: 17, hold: 8,   next: 1000 },
-    { key: 19, hold: 8,   next: 1000 },
-    { key: 20, hold: 2.5, next:  250 },
-    { key: 22, hold: 2.5, next:  250 },
-    { key: 20, hold: 8,   next:  800 },
-    { key: 12, hold: 8,   next: 2000 }
-  ],
+  {
+    name: 'the force theme',
+    song: [
+      { key: 12, hold: 3.5, next:  350 },
+      { key: 17, hold: 8,   next: 1000 },
+      { key: 19, hold: 8,   next: 1000 },
+      { key: 20, hold: 2.5, next:  250 },
+      { key: 22, hold: 2.5, next:  250 },
+      { key: 20, hold: 8,   next:  800 },
+      { key: 12, hold: 8,   next: 2000 }
+    ],
+  },
   // Lost in space (7 notes)
   // https://www.youtube.com/watch?v=--5Z-gwwzzw
   // Star Trek theme (8 notes)
@@ -43,28 +55,21 @@ const SONGS = [
   //   keys: 11,16,21,20,16,13,18,23
   // ],
   // Darth Vader theme (9 notes - 18 extended)
-  [
-    { key:  4, hold: 8,   next: 1000 },
-    { key:  4, hold: 8,   next: 1000 },
-    { key:  4, hold: 8,   next: 1000 },
-    { key:  0, hold: 8,   next:  800 },
-    { key:  7, hold: 5,   next:  350 },
-    { key:  4, hold: 3.5, next: 1000 },
-    { key:  0, hold: 8,   next:  800 },
-    { key:  7, hold: 5,   next:  350 },
-    { key:  4, hold: 3.5, next: 2000 }
-    // { key: 11, hold: 8,   next: 1000 },
-    // { key: 11, hold: 8,   next: 1000 },
-    // { key: 11, hold: 8,   next: 1000 },
-    // { key: 12, hold: 8,   next:  800 },
-    // { key:  7, hold: 5,   next:  350 },
-    // { key:  3, hold: 3.5, next: 1000 },
-    // { key:  0, hold: 8,   next:  800 },
-    // { key:  7, hold: 5,   next:  350 },
-    // { key:  4, hold: 3.5, next: 2000 }
-  ]
+  {
+    name: 'darth vader theme',
+    song: [
+      { key:  4, hold: 8,   next: 1000 },
+      { key:  4, hold: 8,   next: 1000 },
+      { key:  4, hold: 8,   next: 1000 },
+      { key:  0, hold: 8,   next:  800 },
+      { key:  7, hold: 5,   next:  350 },
+      { key:  4, hold: 3.5, next: 1000 },
+      { key:  0, hold: 8,   next:  800 },
+      { key:  7, hold: 5,   next:  350 },
+      { key:  4, hold: 3.5, next: 2000 }
+    ]
+  }
 ];
-
 
 const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between crosshair and ring
 const BASE_RADIUS = 25; // in pixel, inner space for planet
@@ -76,7 +81,6 @@ var currentSong = []; // current song data
 const planet = {};
 let crosshair; // coordinate in viewport space (add viewportOffset to convert to map space)
 let wellPlacedNotes;
-let playFullSong;
 
 
 // RENDER VARIABLES
@@ -129,14 +133,15 @@ function startGame() {
 }
 
 function startPuzzle(s) {
-  playFullSong = true;
+  crosshair.enabled = true;
 
+  // TODO pull this out of PLANETS
   planet.width = 2; // number of BASE_RADIUS
   planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
   planet.y = VIEWPORT.height - (2+planet.width)*BASE_RADIUS;
 
   // clone the current song, that can altered at will without damaging the original template
-  currentSong = SONGS[s].map(note => ({...note}));
+  currentSong = PLANETS[s].song.map(note => ({...note}));
   
   randomizeCurrentSong();
 
@@ -197,7 +202,7 @@ function updateWellPlacedNotes() {
 const crosshairDistanceFromPlanet = () => Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
 const ringUnderCrosshair = () => currentSong.findIndex(
-  note => Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet()) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE)
+  note => crosshair.enabled && Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet()) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE)
 );
 
 function update() {
@@ -210,14 +215,14 @@ function update() {
         currentSong[n].hover = currentTime;
       }
 
-      if (wellPlacedNotes === currentSong.length && playFullSong) {
-        playFullSong = false;
+      if (wellPlacedNotes === currentSong.length && crosshair.enabled) {
+        crosshair.enabled = false;
         // halt current playback
         stopSong(currentSong);
         // play the song one time from start to finish
         playSong(currentSong, () => {
           s += 1;
-          if (s < SONGS.length) {
+          if (s < PLANETS.length) {
             startPuzzle(s);
           } else {
             screen = END_SCREEN;
@@ -271,13 +276,19 @@ function render() {
 
       // HUD
       renderBitmapText(
-        `planets: ${s + 1}/${SONGS.length}`,
+        `planets: ${s + 1}/${PLANETS.length}`,
         CHARSET_SIZE, CHARSET_SIZE, ALIGN_LEFT, 2
       );
       renderBitmapText(
         `notes: ${wellPlacedNotes}/${currentSong.length}`,
         VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT, 2
       );
+      if (!crosshair.enabled) {
+        renderBitmapText(
+          PLANETS[s].name,
+          CHARSET_SIZE, 6*CHARSET_SIZE, ALIGN_LEFT, 2
+        )
+      }
       break;
     case END_SCREEN:
       break;
@@ -376,7 +387,7 @@ onload = async (e) => {
   onresize();
   checkMonetization();
 
-  initAudio(SONGS);
+  initAudio(PLANETS.map(planet => planet.song));
 
   await initCharset(VIEWPORT_CTX);
 
