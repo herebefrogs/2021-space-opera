@@ -49,23 +49,23 @@ export function renderBitmapText(msg, x, y, align = ALIGN_LEFT, scale = 1) {
 };
 
 export function renderText(msg, x, y, align = ALIGN_LEFT, scale = 1, color) {
-  const fontSize = Math.round(16 * scale)
-  ctx.font = `bold italic ${fontSize}px Impact`;
-  ctx.textAlign = align;
-  ctx.textBaseline = 'middle'
-  if (!color) {
-    const textSize = ctx.measureText(msg);
-    const gradient = ctx.createLinearGradient(x - textSize.width/2,y + textSize.fontBoundingBoxAscent, x+textSize.width/2, y+textSize.fontBoundingBoxDescent);
-    gradient.addColorStop(0, '#0b6');
-    gradient.addColorStop(0.33, '#ab0');
-    gradient.addColorStop(0.66, '#b08');
-    gradient.addColorStop(1, '#81a');
-    ctx.fillStyle = gradient;
-  } else {
-    ctx.fillStyle = color;
-  }
-  ctx.fillText(msg, x, y);
-  ctx.lineWidth = 2
-  ctx.strokeStyle = '#000';
-  ctx.strokeText(msg, x, y)
+  // const fontSize = Math.round(16 * scale)
+  // ctx.font = `bold italic ${fontSize}px Impact`;
+  // ctx.textAlign = align;
+  // ctx.textBaseline = 'middle'
+  // if (!color) {
+  //   const textSize = ctx.measureText(msg);
+  //   const gradient = ctx.createLinearGradient(x - textSize.width/2,y + textSize.fontBoundingBoxAscent, x+textSize.width/2, y+textSize.fontBoundingBoxDescent);
+  //   gradient.addColorStop(0, '#0b6');
+  //   gradient.addColorStop(0.33, '#ab0');
+  //   gradient.addColorStop(0.66, '#b08');
+  //   gradient.addColorStop(1, '#81a');
+  //   ctx.fillStyle = gradient;
+  // } else {
+  //   ctx.fillStyle = color;
+  // }
+  // ctx.fillText(msg, x, y);
+  // ctx.lineWidth = 2
+  // ctx.strokeStyle = '#000';
+  // ctx.strokeText(msg, x, y)
 }

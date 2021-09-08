@@ -66,7 +66,7 @@ const SONGS = [
 ];
 
 const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between crosshair and ring
-const BASE_RADIUS = 50; // in pixel, inner space for planet
+const BASE_RADIUS = 25; // in pixel, inner space for planet
 const HUE_HOVER = 300;  // Purple HSL hue in degree, when crosshair over a ring
 let s;            // current song index
 var currentSong = []; // current song data
@@ -105,8 +105,8 @@ let running = true;
 // map piano key [0-35] to hue [0-360] in degree
 const keyToHue = key => key*10;
 
-const mainColor = note => `hsl(${note.hover ? HUE_HOVER : note.hue} 90% ${lerp(90, 50, (currentTime - note.startTime)/note.next)}%)`;
-const trailColor = note => `hsl(${note.hue} 10% 10%)`;
+const mainColor = note => `hsl(${note.hover ? HUE_HOVER : note.hue} ${note.dragged ? 10 : 90}% ${lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
+const trailColor = note => `hsl(${note.hue} 40% 15%)`;
 
 
 function startGame() {
@@ -115,6 +115,7 @@ function startGame() {
   s = 0;
   planet.x = VIEWPORT.width / 2;
   planet.y = VIEWPORT.height;
+  planet.width = 2; // number of BASE_RADIUS
 
   // clone the current song, that can altered at will without damaging the original template
   currentSong = SONGS[s].map(note => ({...note}));
@@ -147,31 +148,21 @@ function updateNotesDisplayAttributes() {
     (currentRadius, note) => {
       // set some rendering
       note.hue = keyToHue(note.key);
-      note.radius = currentRadius + 2*note.hold + note.next/100;
-      note.width = note.hold;
+      note.radius = currentRadius + BASE_RADIUS;
+      note.width = note.next/100;
       note.startTime = 0;
 
       return note.radius;
     },
-    BASE_RADIUS
+    (2+planet.width)*BASE_RADIUS
   );
 }
 
-function swapRings(src, dest) {
-  let srcNote = currentSong[src];
-  let destNote = currentSong[dest];
-  console.log(src, srcNote.id, '->', dest, destNote.id);
+function moveRing(src, dest) {
+  // move src ring to dest ring's position, dest ring is pushed forward the beginning of the song
+  const [ note ] = currentSong.splice(src, 1);
+  currentSong.splice(dest, 0, note);
 
-  // swap notes
-  currentSong[src] = destNote;
-  currentSong[dest] = srcNote;
-
-  // TODO either:
-  // - [x] recalculate all the radiuses, but that's gonna lead to jarring
-  //   AND THIS IS WEIRD INDEED
-  // - [ ] only swap the note frequency (key and buffer) so the song rhythm is preserved
-  //  (but then how to I check that the song has been reconstituted?
-  //  (id vs position ain't enough anymore... key at position vs key in template at position?)
   updateNotesDisplayAttributes();
   updateWellPlacedNotes();
 }
@@ -187,7 +178,7 @@ function updateWellPlacedNotes() {
 function ringUnderCrosshair() {
   const crosshairDistanceFromPlanet = Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
-  return currentSong.find(note => Math.abs(note.radius - crosshairDistanceFromPlanet) <= DISTANCE_TO_TARGET_RANGE);
+  return currentSong.find(note => Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE));
 }
 
 function update() {
@@ -268,12 +259,11 @@ function renderCrosshair() {
 
 function renderEntity(entity, ctx = VIEWPORT_CTX) {
   ctx.save();
-  ctx.shadowBlur = 15;
-  ctx.lineWidth = entity.width;
   
   // trail (not sure if keeping it)
   ctx.beginPath();
-  ctx.arc(planet.x, planet.y, entity.radius-2*entity.hold, 0, 2 * Math.PI);
+  ctx.lineWidth = BASE_RADIUS - entity.width;
+  ctx.arc(planet.x, planet.y, entity.radius - entity.width - ctx.lineWidth/2, 0, 2 * Math.PI);
   ctx.strokeStyle = trailColor(entity);
   ctx.shadowColor = ctx.strokeStyle;
   ctx.stroke();
@@ -281,7 +271,9 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
 
   // ring
   ctx.beginPath();
-  ctx.arc(planet.x, planet.y, entity.radius, 0, 2 * Math.PI);
+  ctx.shadowBlur = Math.max(10, entity.width);
+  ctx.lineWidth = entity.width;
+  ctx.arc(planet.x, planet.y, entity.radius - entity.width/2, 0, 2 * Math.PI);
   ctx.strokeStyle = mainColor(entity);
   ctx.shadowColor = ctx.strokeStyle;
   ctx.stroke();
@@ -444,15 +436,17 @@ onpointerup = function(e) {
       crosshair.touchTime = 0;
 
       const srcNote = currentSong.find(note => note.dragged);
-      srcNote.dragged = 0;
+      if (srcNote) {
+        srcNote.dragged = 0;
+      }
       const destNote = ringUnderCrosshair();
       if (destNote) {
         // TODO it's shitty I need to find the index despite having the note
-        // and swapRings is gonna look for the note from the index...
+        // and srcNote is gonna look for the note from the index...
         // maybe ringUnderCrosshair should return an ID instead?
         const srcIndex = currentSong.findIndex(note => note.id === srcNote.id);
         const destIndex = currentSong.findIndex(note => note.id === destNote.id);
-        swapRings(srcIndex, destIndex);
+        moveRing(srcIndex, destIndex);
       }
       break;
     case END_SCREEN:

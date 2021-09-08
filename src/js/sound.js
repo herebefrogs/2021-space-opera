@@ -5,6 +5,7 @@
 // overlapping notes sound better when played by separate Audio Context
 const NB_AUDIO_CTX = 10;
 let audioCtx = [];
+let VOLUME = 0.3;
 // cache computation expensive audio data, indexed by note + hold
 const memoNoteToData = {};
 let timerId;
@@ -66,13 +67,12 @@ function generateBufferDataForSong(songData) {
 }
 
 function playNote(note, n) {
-  console.log('current:', n, 'real:', note.id);
   // rotate through the audio contexts
   const aCtx = audioCtx[n%NB_AUDIO_CTX];
   const source = aCtx.createBufferSource();
   source.buffer = note.buffer;
   const gain = aCtx.createGain();
-  gain.gain.value = 0.3;
+  gain.gain.value = VOLUME;
   source.connect(gain);
   gain.connect(aCtx.destination);
   source.start();
