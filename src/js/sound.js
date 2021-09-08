@@ -28,14 +28,18 @@ export function initAudio(songs) {
 }
 
 
-export function playSong(song) {
+export function playSong(song, done) {
   let n = 0;
   timerId = setTimeout(function run() {
     // TODO I don't like n++, refactor to
     // - play current note first
     // - decide what should be enqueued and when
     if (n==song.length) {
-        timerId = setTimeout(() => { playSong(song) }, song[0].next);
+        if (done) {
+          done();
+        } else {
+          timerId = setTimeout(() => { playSong(song) }, song[0].next);
+        }
     } else {
       note = song[n];
       playNote(note, n);

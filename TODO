@@ -14,7 +14,7 @@ game feature
     - [x] insert ring at destination (rather than  with destination, easier to reorder notes)
     - [x] mobile friendly controls
   - [x] compare current song's notes to original on each ring reordered
-    - if notes matches, move on to next puzzle
+    - [x] if notes matches, move on to next puzzle
 [tuesday]
   - [x] nicer UI to render rings
     - planets

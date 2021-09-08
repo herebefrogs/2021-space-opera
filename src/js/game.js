@@ -76,6 +76,7 @@ var currentSong = []; // current song data
 const planet = {};
 let crosshair; // coordinate in viewport space (add viewportOffset to convert to map space)
 let wellPlacedNotes;
+let playFullSong;
 
 
 // RENDER VARIABLES
@@ -128,6 +129,7 @@ function startGame() {
 }
 
 function startPuzzle(s) {
+  playFullSong = true;
 
   planet.width = 2; // number of BASE_RADIUS
   planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
@@ -206,6 +208,21 @@ function update() {
       const n = ringUnderCrosshair()
       if (n >= 0 && !currentSong[n].dragged) {
         currentSong[n].hover = currentTime;
+      }
+
+      if (wellPlacedNotes === currentSong.length && playFullSong) {
+        playFullSong = false;
+        // halt current playback
+        stopSong(currentSong);
+        // play the song one time from start to finish
+        playSong(currentSong, () => {
+          s += 1;
+          if (s < SONGS.length) {
+            startPuzzle(s);
+          } else {
+            screen = END_SCREEN;
+          }
+        })
       }
       
       break;
