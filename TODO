@@ -7,7 +7,7 @@ game feature
   - [x] basic UI to render notes as rings
     - [x] glow effect while a note is playing
 [monday]
-  - randomize current song's notes on puzzle start
+  - [x] randomize current song's notes on puzzle start
   - [x] larger rings and trail so drag & drop is easier
   - [x] rings drag & drop
     - [x] visually drag the ring (different color again? accompany the crosshair)

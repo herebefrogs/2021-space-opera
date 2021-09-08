@@ -65,6 +65,7 @@ const SONGS = [
   ]
 ];
 
+
 const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between crosshair and ring
 const BASE_RADIUS = 25; // in pixel, inner space for planet
 const HUE_HOVER = 300;  // Purple HSL hue in degree, when crosshair over a ring
@@ -74,7 +75,6 @@ var currentSong = []; // current song data
 
 const planet = {};
 let crosshair; // coordinate in viewport space (add viewportOffset to convert to map space)
-let entities;
 let wellPlacedNotes;
 
 
@@ -113,35 +113,52 @@ const dragColor = note => `hsl(${note.hue} 90% 60%)`;
 function startGame() {
   // setRandSeed(getRandSeed());
   konamiIndex = 0;
+
+  renderMap();
+  
+  crosshair = {
+    x: -10,
+    y: -10
+  };
+
+  screen = GAME_SCREEN;
+
   s = 0;
+  startPuzzle(s);
+}
+
+function startPuzzle(s) {
+
   planet.width = 2; // number of BASE_RADIUS
   planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
   planet.y = VIEWPORT.height - (2+planet.width)*BASE_RADIUS;
 
   // clone the current song, that can altered at will without damaging the original template
   currentSong = SONGS[s].map(note => ({...note}));
-  // TODO randomize the song
+  
+  randomizeCurrentSong();
 
   updateNotesDisplayAttributes();
-  
+
   // HACK: notes will be used as entities
-  entities = [
-    ...currentSong
-    // TODO add planet
-  ]
-  crosshair = {
-    x: -10,
-    y: -10
-  };
-
-  updateWellPlacedNotes();
-
-  renderMap();
-  
-  screen = GAME_SCREEN;
 
   playSong(currentSong);     
 };
+
+function randomizeCurrentSong() {
+  wellPlacedNotes = currentSong.length;
+
+  // TODO based on the difficulty, randomization threshold could be lower
+  while (wellPlacedNotes > currentSong.length / 2) {
+    let src = randInt(0, currentSong.length - 1);
+    let dest = src;
+    while (dest === src) {
+      dest = randInt(0, currentSong.length - 1);
+    }
+    moveRing(src, dest);
+  };
+}
+
 
 function updateNotesDisplayAttributes() {
   // use reduceRight like a right-to-left forEach
@@ -164,7 +181,6 @@ function moveRing(src, dest) {
   const [ note ] = currentSong.splice(src, 1);
   currentSong.splice(dest, 0, note);
 
-  updateNotesDisplayAttributes();
   updateWellPlacedNotes();
 }
 
@@ -232,7 +248,7 @@ function render() {
         0, 0, VIEWPORT.width, VIEWPORT.height,
         0, 0, VIEWPORT.width, VIEWPORT.height
       );
-      entities.forEach(entity => renderEntity(entity));
+      currentSong.forEach(note => renderRing(note));
       renderDraggedRing(currentSong.find(note => note.dragged));
       renderCrosshair();
 
@@ -261,7 +277,7 @@ function renderCrosshair() {
   VIEWPORT_CTX.strokeRect(crosshair.x - 6, crosshair.y - 6, 12, 12);
 }
 
-function renderEntity(entity, ctx = VIEWPORT_CTX) {
+function renderRing(entity, ctx = VIEWPORT_CTX) {
   ctx.save();
   
   // trail (not sure if keeping it)
@@ -462,6 +478,7 @@ onpointerup = function(e) {
       const dest = ringUnderCrosshair();
       if (dest >= 0) {
         moveRing(src, dest);
+        updateNotesDisplayAttributes();
       }
       break;
     case END_SCREEN:
