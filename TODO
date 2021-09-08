@@ -10,9 +10,9 @@ game feature
   - randomize current song's notes on puzzle start
   - [x] larger rings and trail so drag & drop is easier
   - [x] rings drag & drop
-    - visually drag the ring (different color again? accompany the crosshair)
+    - [x] visually drag the ring (different color again? accompany the crosshair)
     - [x] insert ring at destination (rather than  with destination, easier to reorder notes)
-    - mobile friendly controls
+    - [x] mobile friendly controls
   - [x] compare current song's notes to original on each ring reordered
     - if notes matches, move on to next puzzle
 [tuesday]
@@ -33,11 +33,13 @@ game feature
 [friday]
 - coil
   - if monetization, drop a hint about the song
-- lower sound with a gain node (maybe add a volume slider?)
+- [x] lower sound with a gain node
 [saturday]
-- intro screen
+- intro screen / better font
 - end screen
   - tweet? number of ring moved?
+- restart / title screen
+- stop/resume music on tab change
 [sunday]
 - screenshots
 - update README & repo

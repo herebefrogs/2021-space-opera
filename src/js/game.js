@@ -81,11 +81,11 @@ let wellPlacedNotes;
 // RENDER VARIABLES
 
 // visible canvas (size will be readjusted on load and on resize)
-const [CTX] = createCanvas(1024, 768, c);
+const [CTX] = createCanvas(768, 1024, c);
 // full map, rendered off screen
-const [MAP_CTX, MAP] = createCanvas(640, 480);
+const [MAP_CTX, MAP] = createCanvas(480, 640);
 // visible portion of the map, seen from camera
-const [VIEWPORT_CTX, VIEWPORT] = createCanvas(640, 480);
+const [VIEWPORT_CTX, VIEWPORT] = createCanvas(480, 640);
 
 
 let canvasX;
@@ -107,15 +107,16 @@ const keyToHue = key => key*10;
 
 const mainColor = note => `hsl(${note.hover ? HUE_HOVER : note.hue} ${note.dragged ? 10 : 90}% ${lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
 const trailColor = note => `hsl(${note.hue} 40% 15%)`;
+const dragColor = note => `hsl(${note.hue} 90% 60%)`;
 
 
 function startGame() {
   // setRandSeed(getRandSeed());
   konamiIndex = 0;
   s = 0;
-  planet.x = VIEWPORT.width / 2;
-  planet.y = VIEWPORT.height;
   planet.width = 2; // number of BASE_RADIUS
+  planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
+  planet.y = VIEWPORT.height - (2+planet.width)*BASE_RADIUS;
 
   // clone the current song, that can altered at will without damaging the original template
   currentSong = SONGS[s].map(note => ({...note}));
@@ -175,11 +176,11 @@ function updateWellPlacedNotes() {
   );
 }
 
-function ringUnderCrosshair() {
-  const crosshairDistanceFromPlanet = Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
+const crosshairDistanceFromPlanet = () => Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
-  return currentSong.findIndex(note => Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE));
-}
+const ringUnderCrosshair = () => currentSong.findIndex(
+  note => Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet()) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE)
+);
 
 function update() {
   switch (screen) {
@@ -232,6 +233,10 @@ function render() {
         0, 0, VIEWPORT.width, VIEWPORT.height
       );
       entities.forEach(entity => renderEntity(entity));
+      renderDraggedRing(currentSong.find(note => note.dragged));
+      renderCrosshair();
+
+      // HUD
       renderBitmapText(
         `planets: ${s + 1}/${SONGS.length}`,
         CHARSET_SIZE, CHARSET_SIZE, ALIGN_LEFT, 2
@@ -240,7 +245,6 @@ function render() {
         `notes: ${wellPlacedNotes}/${currentSong.length}`,
         VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT, 2
       );
-      renderCrosshair();
       break;
     case END_SCREEN:
       break;
@@ -278,8 +282,24 @@ function renderEntity(entity, ctx = VIEWPORT_CTX) {
   ctx.shadowColor = ctx.strokeStyle;
   ctx.stroke();
   ctx.closePath();
-  
   ctx.restore();
+}
+
+function renderDraggedRing(entity, ctx = VIEWPORT_CTX) {
+  if (entity) {
+    ctx.save();
+  
+    ctx.beginPath();
+    ctx.shadowBlur = 5;
+    ctx.lineWidth = entity.width;
+    ctx.arc(planet.x, planet.y, crosshairDistanceFromPlanet() - entity.width/2, 0, 2 * Math.PI);
+    ctx.strokeStyle = dragColor(entity);
+    ctx.shadowColor = ctx.strokeStyle;
+    ctx.stroke();
+    ctx.closePath();
+    
+    ctx.restore();
+  }
 };
 
 function renderMap() {
