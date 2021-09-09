@@ -31,12 +31,21 @@ const PLANETS = [
   //   ]
   // }
 
-  // 2001 a space odyssey (5 notes)
-  // [
-  //   key: 9,16,21,25,24
-  // ],
+  {
+    name: '2001 a space odyssey',
+    hint: 'I\'m afraid I can\'t do that, Dave',
+    // 5 notes
+    song: [
+      { key:  9, hold: 15,   next: 2000 },
+      { key: 16, hold: 15,   next: 2000 },
+      { key: 21, hold: 15,   next: 3000 },
+      { key: 25, hold:  2.5, next:  250 },
+      { key: 24, hold:  8,   next: 3000 }
+    ],
+  },
   {
     name: 'the force theme',
+    hint: 'may it be with you, always',
     // 7 notes
     song: [
       { key: 12, hold: 3.5, next:  350 },
@@ -56,6 +65,7 @@ const PLANETS = [
   // ],
   {
     name: 'darth vader theme',
+    hint: 'he is your father',
     // 9 notes
     song: [
       { key:  4, hold: 8,   next: 1000 },
