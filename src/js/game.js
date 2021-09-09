@@ -36,10 +36,10 @@ const PLANETS = [
     hint: 'I\'m afraid I can\'t do that, Dave',
     // 5 notes
     song: [
-      { key:  9, hold: 15,   next: 2000 },
-      { key: 16, hold: 15,   next: 2000 },
-      { key: 21, hold: 15,   next: 3000 },
-      { key: 25, hold:  2.5, next:  250 },
+      { key:  9, hold: 12,   next: 2000 },
+      { key: 16, hold: 12,   next: 2000 },
+      { key: 21, hold: 12,   next: 2000 },
+      { key: 25, hold:  3.5, next:  250 },
       { key: 24, hold:  8,   next: 3000 }
     ],
   },
@@ -153,7 +153,12 @@ function startPuzzle(s) {
   // clone the current song, that can altered at will without damaging the original template
   currentSong = PLANETS[s].song.map(note => ({...note}));
   
-  randomizeCurrentSong();
+  if (s === 0) {
+    // make it easy to pass
+    moveRing(3, 4);
+  } else {
+    randomizeCurrentSong();
+  }
 
   updateNotesDisplayAttributes();
 
@@ -341,20 +346,23 @@ function render() {
       // HUD
       renderBitmapText(
         `planets: ${s + 1}/${PLANETS.length}`,
-        CHARSET_SIZE, CHARSET_SIZE, ALIGN_LEFT, 2
+        SPACE, SPACE, ALIGN_LEFT, 2
       );
       renderBitmapText(
         `notes: ${wellPlacedNotes}/${currentSong.length}`,
-        VIEWPORT.width - CHARSET_SIZE, CHARSET_SIZE, ALIGN_RIGHT, 2
+        VIEWPORT.width - SPACE, SPACE, ALIGN_RIGHT, 2
       );
       if (!crosshair.enabled) {
         renderBitmapText(
           PLANETS[s].name,
-          CHARSET_SIZE, 6*CHARSET_SIZE, ALIGN_LEFT, 2
+          SPACE, 8*SPACE, ALIGN_LEFT, 2
         )
       }
       break;
     case END_SCREEN:
+      renderBitmapText(
+        'thank you for playing',
+        SPACE, 28*SPACE, ALIGN_LEFT, 2);
       break;
   }
 
