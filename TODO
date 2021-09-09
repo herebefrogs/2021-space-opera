@@ -46,7 +46,8 @@ game feature
   - if monetization, drop a hint about the song
 - [x] lower sound with a gain node
 [saturday]
-- intro screen / better font
+- [x] crosshair via CSS cursor default/pointer, grab, move/grabbing
+- [x] intro screen / better font
 - end screen
   - tweet? number of ring moved?
 - restart / title screen

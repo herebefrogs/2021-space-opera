@@ -104,11 +104,11 @@ function getD(note, hold) {
       
       // Modulation
       // This function generates the i'th sample of a sinusoidal signal with a specific frequency and amplitude
-      b = (freq, tt, aa, tick) => Math.sin(freq / tt * 6.28 * aa + tick),
+      s = (freq, tt, aa, tick) => Math.sin(freq / tt * 6.28 * aa + tick),
       
       // Piano synthesis
       w = (freq, tt) =>
-         Math.sin(freq / 44100 * tt * 6.28 + b(freq, 44100, tt, 0) ** 2 + .75 * b(freq, 44100, tt, .25) + .1 * b(freq, 44100, tt, .5)),
+         Math.sin(freq / 44100 * tt * 6.28 + s(freq, 44100, tt, 0) ** 2 + .75 * s(freq, 44100, tt, .25) + .1 * s(freq, 44100, tt, .5)),
       D = [],
       
       // Loop on all the samples

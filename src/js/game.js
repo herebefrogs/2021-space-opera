@@ -252,8 +252,15 @@ function update() {
     case GAME_SCREEN:
       currentSong.forEach(note => { note.hover = 0 });
 
+      if (b.style.cursor !== 'grabbing') {
+        b.style.cursor = 'pointer';
+      }
+
       const n = ringUnderCrosshair()
       if (n >= 0 && !currentSong[n].dragged) {
+        if (b.style.cursor === 'pointer') {
+          b.style.cursor = 'grab';
+        }
         currentSong[n].hover = currentTime;
       }
 
@@ -341,7 +348,6 @@ function render() {
       );
       currentSong.forEach(note => renderRing(note));
       renderDraggedRing(currentSong.find(note => note.dragged));
-      renderCrosshair();
 
       // HUD
       renderBitmapText(
@@ -368,14 +374,6 @@ function render() {
 
   blit();
 };
-
-function renderCrosshair() {
-  // should be a hand
-  VIEWPORT_CTX.strokeStyle = '#fff';
-  VIEWPORT_CTX.lineWidth = 2;
-  VIEWPORT_CTX.strokeRect(crosshair.x - 1, crosshair.y - 1, 2, 2);
-  VIEWPORT_CTX.strokeRect(crosshair.x - 6, crosshair.y - 6, 12, 12);
-}
 
 function renderRing(entity, ctx = VIEWPORT_CTX) {
   ctx.save();
@@ -543,6 +541,7 @@ onpointerdown = function(e) {
 
       const n = ringUnderCrosshair();
       if (n >= 0) {
+        b.style.cursor = 'grabbing';
         currentSong[n].dragged = crosshair.touchTime;
       }
       break;
@@ -568,6 +567,8 @@ onpointerup = function(e) {
       break;
     case GAME_SCREEN:
       crosshair.touchTime = 0;
+
+      b.style.cursor = 'pointer';
 
       const src = currentSong.findIndex(note => note.dragged);
       if (src >= 0) {
