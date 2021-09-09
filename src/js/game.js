@@ -290,15 +290,42 @@ function blit() {
   );
 };
 
+const SPACE = 2*CHARSET_SIZE;
 function render() {
-  VIEWPORT_CTX.fillStyle = '#fff';
+  VIEWPORT_CTX.fillStyle = '#000';
   VIEWPORT_CTX.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 
   switch (screen) {
     case TITLE_SCREEN:
       renderBitmapText(
-        '2021: a space opera',
-        VIEWPORT.width / 2, 2*CHARSET_SIZE, ALIGN_CENTER, 2);
+        '2021',
+        VIEWPORT.width / 2, SPACE, ALIGN_CENTER, 8);
+      renderBitmapText(
+        'a space opera',
+        VIEWPORT.width / 2, 6*SPACE, ALIGN_CENTER, 4);
+
+      renderBitmapText(
+        'space no longer sounds its old self...',
+        SPACE, 18*SPACE, ALIGN_LEFT, 2);
+      renderBitmapText(
+        'bring harmony to the cosmic microwave',
+        SPACE, 20*SPACE, ALIGN_LEFT, 2);
+      renderBitmapText(
+        'background!',
+        SPACE, 22*SPACE, ALIGN_LEFT, 2);
+      renderBitmapText(
+        "drag each planet's rings in the right",
+        SPACE, 26*SPACE, ALIGN_LEFT, 2);
+      renderBitmapText(
+        'order to their iconic tunes...',
+        SPACE, 28*SPACE, ALIGN_LEFT, 2);
+
+      renderBitmapText(
+        'click/tap to start',
+        VIEWPORT.width / 2, 43*SPACE, ALIGN_CENTER, 2);
+      renderBitmapText(
+        'jerome lecomte - js13kgames 2021',
+        VIEWPORT.width / 2, VIEWPORT.height - 2*SPACE, ALIGN_CENTER, 2);
       break;
     case GAME_SCREEN:
       VIEWPORT_CTX.drawImage(

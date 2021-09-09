@@ -6,7 +6,7 @@ import { loadImg } from './utils';
 // L = left arrow
 // R = right arrow
 // T = teapot icon
-export const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789.:!-%,/';
+export const ALPHABET = 'abcdefghijklmnopqrstuvwxyz0123456789.:!-%,/#[]UDLR?\'';
 
 export const ALIGN_LEFT = 'start';
 export const ALIGN_CENTER = 'center';
@@ -14,7 +14,7 @@ export const ALIGN_RIGHT = 'end';
 
 // alphabet sprite, embedded as a base64 encoded dataurl by build script
 import CHARSET from '../img/charset.webp';
-export const CHARSET_SIZE = 8; // in px
+export const CHARSET_SIZE = 5; // in px
 let charset;
 let ctx;
 
