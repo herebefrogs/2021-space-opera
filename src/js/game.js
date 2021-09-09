@@ -35,9 +35,9 @@ const PLANETS = [
   // [
   //   key: 9,16,21,25,24
   // ],
-  // the Force theme (7 notes)
   {
     name: 'the force theme',
+    // 7 notes
     song: [
       { key: 12, hold: 3.5, next:  350 },
       { key: 17, hold: 8,   next: 1000 },
@@ -54,9 +54,9 @@ const PLANETS = [
   // [
   //   keys: 11,16,21,20,16,13,18,23
   // ],
-  // Darth Vader theme (9 notes - 18 extended)
   {
     name: 'darth vader theme',
+    // 9 notes
     song: [
       { key:  4, hold: 8,   next: 1000 },
       { key:  4, hold: 8,   next: 1000 },
@@ -183,20 +183,21 @@ function updateNotesDisplayAttributes() {
   );
 }
 
+function updateWellPlacedNotes() {
+  const templateSong = PLANETS[s].song;
+  // count how many notes have the same key/hold/next values than their counterpart in the template song
+  wellPlacedNotes = currentSong.reduce(
+    (sum, note, n) => sum + (note.key === templateSong[n].key && note.hold === templateSong[n].hold && note.next === templateSong[n].next ? 1 : 0),
+    0
+  );
+}
+
 function moveRing(src, dest) {
   // move src ring to dest ring's position, dest ring is pushed forward the beginning of the song
   const [ note ] = currentSong.splice(src, 1);
   currentSong.splice(dest, 0, note);
 
   updateWellPlacedNotes();
-}
-
-function updateWellPlacedNotes() {
-  // count how many notes hold the same position than their id?
-  wellPlacedNotes = currentSong.reduce(
-    (sum, note, n) => sum + (note.id == n ? 1 : 0),
-    0
-  );
 }
 
 const crosshairDistanceFromPlanet = () => Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
@@ -468,8 +469,6 @@ onpointerdown = function(e) {
   switch (screen) {
     case GAME_SCREEN:
       crosshair.touchTime = currentTime;
-
-      // TODO should I recalculate the touch position?
 
       const n = ringUnderCrosshair();
       if (n >= 0) {

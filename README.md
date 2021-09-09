@@ -1,7 +1,7 @@
-Inkspace
+2021: a Space Odyssey
 ========
 
-My game entry for JS13K Games 2021on the theme "Space", and 2D demake of Nintendo Switch's Splatoon 2.
+My game entry for JS13K Games 2021on the theme "Space".
 
 Getting Started
 ---------------
@@ -12,18 +12,19 @@ Getting Started
 
 3. Run `npm run build` to build an optimized version of the game, packaged for JS13KGAMES submission.
 
+Goal:
+-----
+Space does not sound its old self. Bring harmony to the Cosmic Microwave Background by re-arranging each planet rings to discover their iconic space tune.
 
 Controls
 --------
 
-Desktop only:
-- Move player around with WASD, QZSD or arrow keys
-- Move crosshair around with mouse
-- Shoot with Space or mouse click
+Drag and drop rings to another position with mouse clicks (desktop) or tap (mobile)
 
 Web Monetization
 ----------------
 
+Hints?
 
 
 Special Thanks & Credits
