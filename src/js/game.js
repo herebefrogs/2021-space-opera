@@ -107,8 +107,8 @@ let running = true;
 
 // GAMEPLAY HANDLERS
 
-// map piano key [0-35] to hue [0-360] in degree
-const keyToHue = key => key*10;
+// map piano key [0-35] to hue [225(blue/cold) > 120 (green) > 0 (red/warm) > 270 (violet/hot)] in degree
+const keyToHue = key => ((360 - key*10) + 225)%360;
 
 const mainColor = note => `hsl(${note.hover ? HUE_HOVER : note.hue} ${note.dragged ? 10 : 90}% ${lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
 const trailColor = note => `hsl(${note.hue} 40% 15%)`;
