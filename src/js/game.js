@@ -1,6 +1,6 @@
 import { isMobile } from './mobile';
 import { checkMonetization, isMonetizationEnabled } from './monetization';
-import { initAudio, playSong, stopSong } from './sound';
+import { initAudio, generateBufferDataForNote, playSong, stopSong } from './sound';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText, renderBitmapText } from './text';
 import { choice, clamp, getRandSeed, setRandSeed, lerp, loadImg, rand, randInt } from './utils';
@@ -194,8 +194,16 @@ function updateWellPlacedNotes() {
 
 function moveRing(src, dest) {
   // move src ring to dest ring's position, dest ring is pushed forward the beginning of the song
-  const [ note ] = currentSong.splice(src, 1);
-  currentSong.splice(dest, 0, note);
+  // const [ note ] = currentSong.splice(src, 1);
+  // currentSong.splice(dest, 0, note);
+  // move src ring's key to dest ring's position (hold and next don't change to preserve the rhythm of the song
+  // and be easier to guess) and regenerate the audio buffer data.
+
+  const srcKey = currentSong[src].key;
+  currentSong[src].key = currentSong[dest].key;
+  currentSong[dest].key = srcKey;
+  generateBufferDataForNote(currentSong[src]);
+  generateBufferDataForNote(currentSong[dest]);
 
   updateWellPlacedNotes();
 }

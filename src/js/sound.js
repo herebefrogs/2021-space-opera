@@ -59,14 +59,16 @@ export function stopSong(song) {
   });
 }
 
+export function generateBufferDataForNote(note) {
+  note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
+  note.buffer.getChannelData(0).set(getD(note.key, note.hold));
+}
+
 // private implementation
 
 // add an audio buffer to each note of the song, matching the note parameters
 function generateBufferDataForSong(songData) {
-  songData.forEach((note, n) => {
-    note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
-    note.buffer.getChannelData(0).set(getD(note.key, note.hold));
-  });
+  songData.forEach(generateBufferDataForNote);
 }
 
 function playNote(note, n) {

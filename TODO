@@ -27,8 +27,9 @@ game feature
     - [x] when notes in correct order, disable crosshair drag and reveal the song name
     - [x] bug: darth vader song has similar notes, but their ID prevent them from matching is in a place of an equal note
         => compare key/hold/next rather than IDs to indices
-    - may be easier if only keys where swapped rather than key/hold/next
+    - [x] may be easier if only keys where swapped rather than key/hold/next
         => would require the same comparison than fixing the bug anyway
+        => back to ring swaps... shifting rings require to recalculate all audio buffer... could be expensive
     - [x] maybe red/warm should be high pitch, and blue/cold should be low pitch
   - more tunes
     - 2001 a space odyssey (tuto)
