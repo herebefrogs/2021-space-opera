@@ -29,8 +29,8 @@ const PLANETS = [
   // }
 
   {
-    name: '2001 a space odyssey',
-    hint: 'I\'m afraid I can\'t do that, Dave',
+    name: '2001: a space odyssey',
+    hint: 'i\'m afraid i can\'t do that, dave',
     // 5 notes
     song: [
       { key:  9, hold: 12,   next: 2000 },  // this is larger than BASE_RADIUS
@@ -82,7 +82,7 @@ const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between cr
 // NOTE: must always be larger than hold+next/100
 const BASE_RADIUS = 35; // in pixel, inner space for planet
 const HUE_HOVER = 300;  // Purple HSL hue in degree, when crosshair over a ring
-let s;            // current song index
+let s = 0;            // current song index
 var currentSong = []; // current song data
 
 
@@ -123,10 +123,11 @@ const trailColor = note => `hsl(${note.hue} 40% ${note.hover && crosshair.touchT
 
 function initTitleScreen() {
   renderMap();
-  currentSong = PLANETS[0].song.map(note => ({...note}));
+  currentSong = PLANETS[s].song.map(note => ({...note}));
+  moveRing(3, 4);
   planet.width = 2; // number of BASE_RADIUS
-  planet.x = VIEWPORT.width - BASE_RADIUS;
-  planet.y = VIEWPORT.height - BASE_RADIUS;
+  planet.x = VIEWPORT.width;
+  planet.y = VIEWPORT.height;
   updateNotesDisplayAttributes();
 }
 
@@ -234,12 +235,17 @@ function moveRing(src, dest) {
   //   generateBufferDataForNote(currentSong[start + n]);
   // });
 
-  // swap src and dest, leaving all notes in between in place... is this more natural?
-  const srcKey = currentSong[src].key;
-  currentSong[src].key = currentSong[dest].key;
-  currentSong[dest].key = srcKey;
-  generateBufferDataForNote(currentSong[src]);
-  generateBufferDataForNote(currentSong[dest]);
+  // swap src and dest keys, leaving all notes in between in place
+  // const srcKey = currentSong[src].key;
+  // currentSong[src].key = currentSong[dest].key;
+  // currentSong[dest].key = srcKey;
+  // generateBufferDataForNote(currentSong[src]);
+  // generateBufferDataForNote(currentSong[dest]);
+
+  // swap src and dest notes, leaving all notes in between in place
+  const srcNote = currentSong[src];
+  currentSong[src] = currentSong[dest];
+  currentSong[dest] = srcNote;
 
   updateWellPlacedNotes();
 }
@@ -358,33 +364,39 @@ function render() {
         VIEWPORT.width - SPACE, VIEWPORT.height - 2*SPACE, ALIGN_RIGHT, 2
       );
 
-      if (s === 0) {
-        renderBitmapText(
-          "guess each planet's iconic tune. each",
-          SPACE, 8*SPACE, ALIGN_LEFT, 2);
-        renderBitmapText(
-          'colored ring is a note of the tune.',
-          SPACE, 10*SPACE, ALIGN_LEFT, 2);
-  
-        renderBitmapText(
-          'wider rings, longer notes.',
-          SPACE, 14*SPACE, ALIGN_LEFT, 2);
-        renderBitmapText(
-          'colder colors, lower notes...',
-          SPACE, 16*SPACE, ALIGN_LEFT, 2);
-        renderBitmapText(
-          '...warmer colors, higher ones.',
-          SPACE, 18*SPACE, ALIGN_LEFT, 2);
-  
-        renderBitmapText(
-          "swap rings to recompose the tune.",
-          SPACE, 22*SPACE, ALIGN_LEFT, 2);
-      }
+      if (crosshair.enabled) {
+        if (s === 0) {
+          renderBitmapText(
+            "guess each planet's iconic tune. each",
+            SPACE, 6*SPACE, ALIGN_LEFT, 2);
+          renderBitmapText(
+            'colored ring is a note of the tune.',
+            SPACE, 8*SPACE, ALIGN_LEFT, 2);  
+          renderBitmapText(
+            "swap rings to recompose the tune.",
+            SPACE, 10*SPACE, ALIGN_LEFT, 2);
+    
+          renderBitmapText(
+            'wider rings, longer notes.',
+            SPACE, 14*SPACE, ALIGN_LEFT, 2);
+          renderBitmapText(
+            'colder colors, lower notes...',
+            SPACE, 16*SPACE, ALIGN_LEFT, 2);
+          renderBitmapText(
+            '...warmer colors, higher ones.',
+            SPACE, 18*SPACE, ALIGN_LEFT, 2);
 
-      if (!crosshair.enabled) {
+          renderBitmapText(
+            "here's a hint:",
+            SPACE, 24*SPACE, ALIGN_LEFT, 2);
+        }
+        renderBitmapText(
+          PLANETS[s].hint,
+          VIEWPORT.width / 2, (s === 0 ? 26: 16)*SPACE, ALIGN_CENTER, 2);
+      } else {
         renderBitmapText(
           PLANETS[s].name,
-          VIEWPORT.width / 2, (s === 0 ? 34 : 16)*SPACE, ALIGN_CENTER, 2
+          VIEWPORT.width / 2, 16*SPACE, ALIGN_CENTER, 2
         )
       }
       break;
