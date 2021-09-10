@@ -246,7 +246,7 @@ function moveRing(src, dest) {
 const crosshairDistanceFromPlanet = () => Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
 const ringUnderCrosshair = () => currentSong.findIndex(
-  note => crosshair.enabled && Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet()) <= Math.max(note.width, DISTANCE_TO_TARGET_RANGE)
+  note => crosshair.enabled && Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet()) <= Math.max(note.width/2, DISTANCE_TO_TARGET_RANGE)
 );
 
 function update() {
@@ -390,7 +390,10 @@ function render() {
     case END_SCREEN:
       renderBitmapText(
         'thank you for playing',
-        SPACE, 28*SPACE, ALIGN_LEFT, 2);
+        VIEWPORT.width/2, 28*SPACE, ALIGN_CENTER, 2);
+      renderBitmapText(
+        '2001: a space opera',
+        VIEWPORT.width/2, 32*SPACE, ALIGN_CENTER, 4);
       break;
   }
 

@@ -32,7 +32,7 @@ game feature
     - [x] cursor position broken in Firefox... either debug or make the canvas full screen (even though just render the current viewport)
     - [x] tuto explaining the color, width (and glow) significance on space odyssey
     - static noise while playing song in Firefox... too much activity in the main thread I bet you
-    - tiny ring in puzzle #1 impossible to grab
+    - [x] tiny ring in puzzle #1 impossible to grab
     - ring move animated would help understand what's happening
       - [x] remove hover and drag colors, since cursor is now explicit... less confusion with hue
   - more tunes
