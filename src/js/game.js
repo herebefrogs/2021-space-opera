@@ -118,8 +118,8 @@ let running = true;
 // map piano key [0-35] to hue [225(blue/cold) > 120 (green) > 0 (red/warm) > 270 (violet/hot)] in degree
 const keyToHue = key => ((360 - key*10) + 225)%360;
 
-const mainColor = note => `hsl(${note.hue} 90% ${lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
-const trailColor = note => `hsl(${note.hue} 40% 15%)`;
+const ringColor = note => `hsl(${note.hue} ${note.hover && crosshair.touchTime ? 10 : 90}% ${note.hover && crosshair.touchTime ? 90 : lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
+const trailColor = note => `hsl(${note.hue} 40% ${note.hover && crosshair.touchTime ? 90 : 15}%)`;
 
 function initTitleScreen() {
   renderMap();
@@ -402,30 +402,30 @@ function render() {
 };
 
 function renderRing(note) {
-  VIEWPORT_CTX.save();
-  
-  // trail (not sure if keeping it)
-  VIEWPORT_CTX.beginPath();
-  VIEWPORT_CTX.lineWidth = BASE_RADIUS - note.width;
-  VIEWPORT_CTX.arc(planet.x, planet.y, note.radius - note.width - VIEWPORT_CTX.lineWidth/2, 0, 2 * Math.PI);
-  VIEWPORT_CTX.strokeStyle = trailColor(note);
-  VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
-  VIEWPORT_CTX.stroke();
-  VIEWPORT_CTX.closePath();
-
-  // ring
   if (!note.dragged) {
+    VIEWPORT_CTX.save();
+  
+    // trail (not sure if keeping it)
+    VIEWPORT_CTX.beginPath();
+    VIEWPORT_CTX.lineWidth = BASE_RADIUS - note.width;
+    VIEWPORT_CTX.arc(planet.x, planet.y, note.radius - note.width - VIEWPORT_CTX.lineWidth/2, 0, 2 * Math.PI);
+    VIEWPORT_CTX.strokeStyle = trailColor(note);
+    VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
+    VIEWPORT_CTX.stroke();
+    VIEWPORT_CTX.closePath();
+
+    // ring
     VIEWPORT_CTX.beginPath();
     VIEWPORT_CTX.shadowBlur = Math.max(10, note.width);
     VIEWPORT_CTX.lineWidth = note.width;
     VIEWPORT_CTX.arc(planet.x, planet.y, note.radius - note.width/2, 0, 2 * Math.PI);
-    VIEWPORT_CTX.strokeStyle = mainColor(note);
+    VIEWPORT_CTX.strokeStyle = ringColor(note);
     VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
     VIEWPORT_CTX.stroke();
     VIEWPORT_CTX.closePath();
+    
+    VIEWPORT_CTX.restore();
   }
-
-  VIEWPORT_CTX.restore();
 }
 
 function renderDraggedRing(note) {
@@ -436,7 +436,7 @@ function renderDraggedRing(note) {
     VIEWPORT_CTX.shadowBlur = 5;
     VIEWPORT_CTX.lineWidth = note.width;
     VIEWPORT_CTX.arc(planet.x, planet.y, crosshairDistanceFromPlanet() - note.width/2, 0, 2 * Math.PI);
-    VIEWPORT_CTX.strokeStyle = mainColor(note);
+    VIEWPORT_CTX.strokeStyle = ringColor(note);
     VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
     VIEWPORT_CTX.stroke();
     VIEWPORT_CTX.closePath();
