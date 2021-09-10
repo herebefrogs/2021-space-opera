@@ -211,35 +211,35 @@ function updateWellPlacedNotes() {
 }
 
 function moveRing(src, dest) {
-  const start = Math.min(src, dest);
-  const end = Math.max(src, dest);
+  // const start = Math.min(src, dest);
+  // const end = Math.max(src, dest);
 
-  // only keep the keys between start and end, since hold/next and other attributes stay in place
-  const shiftedKeys = currentSong.slice(start, end+1).map(note => note.key);
+  // // only keep the keys between start and end, since hold/next and other attributes stay in place
+  // const shiftedKeys = currentSong.slice(start, end+1).map(note => note.key);
 
-  // move src key in dest's position, shifting all keys in between toward src's original position
-  // this allows shifting an entire range of keys
-  if (src === start) {
-    const srcKey = shiftedKeys.shift();
-    shiftedKeys.push(srcKey);
-  } else {
-    const srcKey = shiftedKeys.pop();
-    shiftedKeys.unshift(srcKey);
-  }
+  // // move src key in dest's position, shifting all keys in between toward src's original position
+  // // this allows shifting an entire range of keys
+  // if (src === start) {
+  //   const srcKey = shiftedKeys.shift();
+  //   shiftedKeys.push(srcKey);
+  // } else {
+  //   const srcKey = shiftedKeys.pop();
+  //   shiftedKeys.unshift(srcKey);
+  // }
 
-  // now that the series of keys is properly ordered, apply them to their notes
-  // and regenerate the audio buffer data based on the new key/hold pair
-  shiftedKeys.forEach((key, n) => {
-    currentSong[start + n].key = key;
-    generateBufferDataForNote(currentSong[start + n]);
-  });
+  // // now that the series of keys is properly ordered, apply them to their notes
+  // // and regenerate the audio buffer data based on the new key/hold pair
+  // shiftedKeys.forEach((key, n) => {
+  //   currentSong[start + n].key = key;
+  //   generateBufferDataForNote(currentSong[start + n]);
+  // });
 
   // swap src and dest, leaving all notes in between in place... is this more natural?
-  // const srcKey = currentSong[src].key;
-  // currentSong[src].key = currentSong[dest].key;
-  // currentSong[dest].key = srcKey;
-  // generateBufferDataForNote(currentSong[src]);
-  // generateBufferDataForNote(currentSong[dest]);
+  const srcKey = currentSong[src].key;
+  currentSong[src].key = currentSong[dest].key;
+  currentSong[dest].key = srcKey;
+  generateBufferDataForNote(currentSong[src]);
+  generateBufferDataForNote(currentSong[dest]);
 
   updateWellPlacedNotes();
 }
