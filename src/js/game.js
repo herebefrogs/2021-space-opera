@@ -33,7 +33,7 @@ const PLANETS = [
     hint: 'I\'m afraid I can\'t do that, Dave',
     // 5 notes
     song: [
-      { key:  9, hold: 12,   next: 2000 },
+      { key:  9, hold: 12,   next: 2000 },  // this is larger than BASE_RADIUS
       { key: 16, hold: 12,   next: 2000 },
       { key: 21, hold: 12,   next: 2000 },
       { key: 25, hold:  3.5, next:  250 },
@@ -79,7 +79,8 @@ const PLANETS = [
 ];
 
 const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between crosshair and ring
-const BASE_RADIUS = 25; // in pixel, inner space for planet
+// NOTE: must always be larger than hold+next/100
+const BASE_RADIUS = 35; // in pixel, inner space for planet
 const HUE_HOVER = 300;  // Purple HSL hue in degree, when crosshair over a ring
 let s;            // current song index
 var currentSong = []; // current song data
