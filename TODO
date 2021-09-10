@@ -30,10 +30,11 @@ game feature
         => would require the same comparison than fixing the bug anyway
     - [x] maybe red/warm should be high pitch, and blue/cold should be low pitch
     - [x] cursor position broken in Firefox... either debug or make the canvas full screen (even though just render the current viewport)
-    - tuto explaining the color, width (and glow) significance on space odyssey
+    - [x] tuto explaining the color, width (and glow) significance on space odyssey
     - static noise while playing song in Firefox... too much activity in the main thread I bet you
     - tiny ring in puzzle #1 impossible to grab
     - ring move animated would help understand what's happening
+      - [x] remove hover and drag colors, since cursor is now explicit... less confusion with hue
   - more tunes
     - [x] 2001 a space odyssey (tuto)
     - star trek theme (short/easy)

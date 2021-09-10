@@ -6,9 +6,6 @@ import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, rende
 import { choice, clamp, getRandSeed, setRandSeed, lerp, loadImg, rand, randInt } from './utils';
 
 
-const konamiCode = [38, 38, 40, 40, 37, 39, 37, 39, 66, 65];
-let konamiIndex = 0;
-
 // GAMEPLAY VARIABLES
 
 const TITLE_SCREEN = 0;
@@ -120,16 +117,21 @@ let running = true;
 // map piano key [0-35] to hue [225(blue/cold) > 120 (green) > 0 (red/warm) > 270 (violet/hot)] in degree
 const keyToHue = key => ((360 - key*10) + 225)%360;
 
-const mainColor = note => `hsl(${note.hover ? HUE_HOVER : note.hue} ${note.dragged ? 10 : 90}% ${lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
+const mainColor = note => `hsl(${note.hue} 90% ${lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
 const trailColor = note => `hsl(${note.hue} 40% 15%)`;
-const dragColor = note => `hsl(${note.hue} 90% 60%)`;
 
+function initTitleScreen() {
+  renderMap();
+  currentSong = PLANETS[0].song.map(note => ({...note}));
+  planet.width = 2; // number of BASE_RADIUS
+  planet.x = VIEWPORT.width - BASE_RADIUS;
+  planet.y = VIEWPORT.height - BASE_RADIUS;
+  updateNotesDisplayAttributes();
+}
 
 function startGame() {
   // setRandSeed(getRandSeed());
   konamiIndex = 0;
-
-  renderMap();
   
   crosshair = {
     x: -10,
@@ -146,9 +148,9 @@ function startPuzzle(s) {
   crosshair.enabled = true;
 
   // TODO pull this out of PLANETS
-  planet.width = 2; // number of BASE_RADIUS
-  planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
-  planet.y = VIEWPORT.height - (2+planet.width)*BASE_RADIUS;
+  // planet.width = 2; // number of BASE_RADIUS
+  // planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
+  // planet.y = VIEWPORT.height - (2+planet.width)*BASE_RADIUS;
 
   // clone the current song, that can altered at will without damaging the original template
   currentSong = PLANETS[s].song.map(note => ({...note}));
@@ -303,12 +305,19 @@ function blit() {
 };
 
 const SPACE = 2*CHARSET_SIZE;
-function render() {
-  VIEWPORT_CTX.fillStyle = '#000';
-  VIEWPORT_CTX.fillRect(0, 0, VIEWPORT.width, VIEWPORT.height);
 
+function render() {
+  VIEWPORT_CTX.drawImage(
+    MAP,
+    // adjust x/y offset
+    0, 0, VIEWPORT.width, VIEWPORT.height,
+    0, 0, VIEWPORT.width, VIEWPORT.height
+  );
+  
   switch (screen) {
     case TITLE_SCREEN:
+      currentSong.forEach(renderRing);
+
       renderBitmapText(
         '2021',
         VIEWPORT.width / 2, SPACE, ALIGN_CENTER, 8);
@@ -325,28 +334,17 @@ function render() {
       renderBitmapText(
         'background!',
         SPACE, 22*SPACE, ALIGN_LEFT, 2);
-      renderBitmapText(
-        "drag each planet's rings in the right",
-        SPACE, 26*SPACE, ALIGN_LEFT, 2);
-      renderBitmapText(
-        'order to their iconic tunes...',
-        SPACE, 28*SPACE, ALIGN_LEFT, 2);
 
       renderBitmapText(
         'click/tap to start',
-        VIEWPORT.width / 2, 43*SPACE, ALIGN_CENTER, 2);
+        VIEWPORT.width / 2, 34*SPACE, ALIGN_CENTER, 2);
+
       renderBitmapText(
         'jerome lecomte - js13kgames 2021',
         VIEWPORT.width / 2, VIEWPORT.height - 2*SPACE, ALIGN_CENTER, 2);
       break;
     case GAME_SCREEN:
-      VIEWPORT_CTX.drawImage(
-        MAP,
-        // adjust x/y offset
-        0, 0, VIEWPORT.width, VIEWPORT.height,
-        0, 0, VIEWPORT.width, VIEWPORT.height
-      );
-      currentSong.forEach(note => renderRing(note));
+      currentSong.forEach(renderRing);
       renderDraggedRing(currentSong.find(note => note.dragged));
 
       // HUD
@@ -356,12 +354,36 @@ function render() {
       );
       renderBitmapText(
         `notes: ${wellPlacedNotes}/${currentSong.length}`,
-        VIEWPORT.width - SPACE, SPACE, ALIGN_RIGHT, 2
+        VIEWPORT.width - SPACE, VIEWPORT.height - 2*SPACE, ALIGN_RIGHT, 2
       );
+
+      if (s === 0) {
+        renderBitmapText(
+          "guess each planet's iconic tune. each",
+          SPACE, 8*SPACE, ALIGN_LEFT, 2);
+        renderBitmapText(
+          'colored ring is a note of the tune.',
+          SPACE, 10*SPACE, ALIGN_LEFT, 2);
+  
+        renderBitmapText(
+          'wider rings, longer notes.',
+          SPACE, 14*SPACE, ALIGN_LEFT, 2);
+        renderBitmapText(
+          'colder colors, lower notes...',
+          SPACE, 16*SPACE, ALIGN_LEFT, 2);
+        renderBitmapText(
+          '...warmer colors, higher ones.',
+          SPACE, 18*SPACE, ALIGN_LEFT, 2);
+  
+        renderBitmapText(
+          "swap rings to recompose the tune.",
+          SPACE, 22*SPACE, ALIGN_LEFT, 2);
+      }
+
       if (!crosshair.enabled) {
         renderBitmapText(
           PLANETS[s].name,
-          SPACE, 8*SPACE, ALIGN_LEFT, 2
+          VIEWPORT.width / 2, (s === 0 ? 34 : 16)*SPACE, ALIGN_CENTER, 2
         )
       }
       break;
@@ -375,44 +397,47 @@ function render() {
   blit();
 };
 
-function renderRing(entity, ctx = VIEWPORT_CTX) {
-  ctx.save();
+function renderRing(note) {
+  VIEWPORT_CTX.save();
   
   // trail (not sure if keeping it)
-  ctx.beginPath();
-  ctx.lineWidth = BASE_RADIUS - entity.width;
-  ctx.arc(planet.x, planet.y, entity.radius - entity.width - ctx.lineWidth/2, 0, 2 * Math.PI);
-  ctx.strokeStyle = trailColor(entity);
-  ctx.shadowColor = ctx.strokeStyle;
-  ctx.stroke();
-  ctx.closePath();
+  VIEWPORT_CTX.beginPath();
+  VIEWPORT_CTX.lineWidth = BASE_RADIUS - note.width;
+  VIEWPORT_CTX.arc(planet.x, planet.y, note.radius - note.width - VIEWPORT_CTX.lineWidth/2, 0, 2 * Math.PI);
+  VIEWPORT_CTX.strokeStyle = trailColor(note);
+  VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
+  VIEWPORT_CTX.stroke();
+  VIEWPORT_CTX.closePath();
 
   // ring
-  ctx.beginPath();
-  ctx.shadowBlur = Math.max(10, entity.width);
-  ctx.lineWidth = entity.width;
-  ctx.arc(planet.x, planet.y, entity.radius - entity.width/2, 0, 2 * Math.PI);
-  ctx.strokeStyle = mainColor(entity);
-  ctx.shadowColor = ctx.strokeStyle;
-  ctx.stroke();
-  ctx.closePath();
-  ctx.restore();
+  if (!note.dragged) {
+    VIEWPORT_CTX.beginPath();
+    VIEWPORT_CTX.shadowBlur = Math.max(10, note.width);
+    VIEWPORT_CTX.lineWidth = note.width;
+    VIEWPORT_CTX.arc(planet.x, planet.y, note.radius - note.width/2, 0, 2 * Math.PI);
+    VIEWPORT_CTX.strokeStyle = mainColor(note);
+    VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
+    VIEWPORT_CTX.stroke();
+    VIEWPORT_CTX.closePath();
+  }
+
+  VIEWPORT_CTX.restore();
 }
 
-function renderDraggedRing(entity, ctx = VIEWPORT_CTX) {
-  if (entity) {
-    ctx.save();
+function renderDraggedRing(note) {
+  if (note) {
+    VIEWPORT_CTX.save();
   
-    ctx.beginPath();
-    ctx.shadowBlur = 5;
-    ctx.lineWidth = entity.width;
-    ctx.arc(planet.x, planet.y, crosshairDistanceFromPlanet() - entity.width/2, 0, 2 * Math.PI);
-    ctx.strokeStyle = dragColor(entity);
-    ctx.shadowColor = ctx.strokeStyle;
-    ctx.stroke();
-    ctx.closePath();
+    VIEWPORT_CTX.beginPath();
+    VIEWPORT_CTX.shadowBlur = 5;
+    VIEWPORT_CTX.lineWidth = note.width;
+    VIEWPORT_CTX.arc(planet.x, planet.y, crosshairDistanceFromPlanet() - note.width/2, 0, 2 * Math.PI);
+    VIEWPORT_CTX.strokeStyle = mainColor(note);
+    VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
+    VIEWPORT_CTX.stroke();
+    VIEWPORT_CTX.closePath();
     
-    ctx.restore();
+    VIEWPORT_CTX.restore();
   }
 };
 
@@ -457,9 +482,9 @@ onload = async (e) => {
   onresize();
   checkMonetization();
 
-  initAudio(PLANETS.map(planet => planet.song));
-
   await initCharset(VIEWPORT_CTX);
+  initAudio(PLANETS.map(planet => planet.song));
+  initTitleScreen();
 
   toggleLoop(true);
 };
@@ -506,13 +531,6 @@ onkeydown = function(e) {
 
 onkeyup = function(e) {
   switch (screen) {
-    case TITLE_SCREEN:
-      if (e.which !== konamiCode[konamiIndex] || konamiIndex === konamiCode.length) {
-        startGame();
-      } else {
-        konamiIndex++;
-      }
-      break;
     case GAME_SCREEN:
       break;
     case END_SCREEN:
