@@ -7,7 +7,7 @@
     "clean": "rm -rf dist && mkdir dist",
     "build": "run-s clean build:*",
     "build:js": "esbuild src/js/game.js --bundle --format=iife --loader:.webp=dataurl | terser --config-file scripts/terser.config.js | roadroller --optimize 2 -o dist/game.js -t js -- -",
-    "build:html": "grep -v '<body' src/index.html | html-inline -b dist | html-minifier -c scripts/htmlmin.json -o dist/index.html",
+    "build:html": "cat src/index.html | html-inline -b dist | html-minifier -c scripts/htmlmin.json -o dist/index.html",
     "build:zip": "zip -FS -qjX9 dist/game.zip dist/index.html && advzip -z -4 dist/game.zip",
     "build:zipSize": "node scripts/zipSize.js",
     "start": "npm-run-all -s clean -p dev:*",
