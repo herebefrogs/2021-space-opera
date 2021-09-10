@@ -590,18 +590,8 @@ onpointerup = function(e) {
 function pointerLocation(e) {
   // for multiple pointers, use e.pointerId to differentiate (on desktop, mouse is always 1, on mobile every pointer even has a different id incrementing by 1)
   // for surface area of touch contact, use e.width and e.height (in CSS pixel) mutiplied by window.devicePixelRatio (for device pixels aka canvas pixels)
-  // for canvas space coordinate, use e.layerX and .layerY when e.target = c
+  // e.layerX and .layerY isn't consistent in Chrome (gives x/y in e.target space) and Firefox (gives x/y in window space, always)
   // { id: e.pointerId, x: e.x, y: e.y, w: e.width*window.devicePixelRatio, h: e.height*window.devicePixelRatio};
-  
-  const pointerInCanvas = e.target === c;
-
-  if (pointerInCanvas) {
-    // touch/click happened on canvas, layerX/layerY are already in canvas space
-    return [
-      Math.round(e.layerX / scaleToFit),
-      Math.round(e.layerY / scaleToFit)
-    ];
-  }
 
   // touch/click happened outside of canvas (which is centered horizontally)
   // x/pageX/y/pageY are in screen space, must be offset by canvas position then scaled down
