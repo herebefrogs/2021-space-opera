@@ -262,12 +262,12 @@ function update() {
       currentSong.forEach(note => { note.hover = 0 });
 
       if (b.style.cursor !== 'grabbing') {
-        b.style.cursor = 'pointer';
+        b.style.cursor = 'default';
       }
 
       const n = ringUnderCrosshair()
       if (n >= 0 && !currentSong[n].dragged) {
-        if (b.style.cursor === 'pointer') {
+        if (b.style.cursor === 'default') {
           b.style.cursor = 'grab';
         }
         currentSong[n].hover = currentTime;
@@ -602,7 +602,7 @@ onpointerup = function(e) {
     case GAME_SCREEN:
       crosshair.touchTime = 0;
 
-      b.style.cursor = 'pointer';
+      b.style.cursor = 'default';
 
       const src = currentSong.findIndex(note => note.dragged);
       if (src >= 0) {
