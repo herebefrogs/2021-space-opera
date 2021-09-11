@@ -37,29 +37,34 @@ game feature
       - [x] remove hover and drag colors, since cursor is now explicit... less confusion with hue
   - more tunes
     - [x] 2001 a space odyssey (tuto)
-    - star trek theme (short/easy)
-    - star trek TNG theme?
     - [x] star wars force (short/easy)
     - [x] star wars darth vader (long/hard)
+
+[friday]
+- [x] star field
+- [x] lower sound with a gain node
+[saturday]
+- mobile bugs
+  - [x] coordinates seem to be off
+  - rings are too small (hover the whole ring+trail if mobile?)
+- tunes
+    - star trek theme (short/easy)
+    - star trek TNG theme?
     - lost in Space
     - battle star galactica
     - alien
     - galaxy quest
     - david bowie space oddity
     - https://vertfromage.github.io/miniPiano/pianoPlayback.html
-[friday]
+- coil
+  - if monetization, show which rings are correctly placed
+- end screen
+  - tweet? number of ring moved?
 - planets
   - color planet
   - fix planet not loading on Firefox
-- [x] star field
-- coil
-  - if monetization, drop a hint about the song
-- [x] lower sound with a gain node
-[saturday]
 - [x] crosshair via CSS cursor default/pointer, grab, move/grabbing
 - [x] intro screen / better font
-- end screen
-  - tweet? number of ring moved?
 - [x] restart / title screen
 - [x] stop/resume music on tab change
 [sunday]

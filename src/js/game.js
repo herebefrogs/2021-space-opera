@@ -607,6 +607,8 @@ onpointerdown = function(e) {
     case GAME_SCREEN:
       crosshair.touchTime = currentTime;
 
+      setCrosshairLocation(pointerLocation(e));;
+
       const n = ringUnderCrosshair();
       if (n >= 0) {
         b.style.cursor = 'grabbing';
@@ -621,9 +623,7 @@ onpointermove = function(e) {
   e.preventDefault();
   switch (screen) {
     case GAME_SCREEN:
-      const [touchX, touchY] = pointerLocation(e);
-      crosshair.x = touchX;
-      crosshair.y = touchY;
+      setCrosshairLocation(pointerLocation(e));
       break;
   }
 }
@@ -678,3 +678,8 @@ function pointerLocation(e) {
     )
   ];
 };
+
+function setCrosshairLocation([touchX, touchY]) {
+  crosshair.x = touchX;
+  crosshair.y = touchY;
+}
