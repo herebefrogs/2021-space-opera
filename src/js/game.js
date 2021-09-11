@@ -607,11 +607,12 @@ onpointerup = function(e) {
       const src = currentSong.findIndex(note => note.dragged);
       if (src >= 0) {
         currentSong[src].dragged = 0;
-      }
-      const dest = ringUnderCrosshair();
-      if (dest >= 0) {
-        moveRing(src, dest);
-        updateNotesDisplayAttributes();
+
+        const dest = ringUnderCrosshair();
+        if (dest >= 0) {
+          moveRing(src, dest);
+          updateNotesDisplayAttributes();
+        }
       }
       break;
     case END_SCREEN:
