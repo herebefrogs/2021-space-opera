@@ -70,7 +70,7 @@ const PLANETS = [
       { key:  4, hold: 8,   next: 1000 },
       { key:  0, hold: 8,   next:  800 },
       { key:  7, hold: 5,   next:  350 },
-      { key:  4, hold: 3.5, next: 1000 },
+      { key:  4, hold: 8,   next: 1000 },
       { key:  0, hold: 8,   next:  800 },
       { key:  7, hold: 5,   next:  350 },
       { key:  4, hold: 3.5, next: 2000 }
