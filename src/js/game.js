@@ -29,8 +29,9 @@ const PLANETS = [
   // }
 
   {
-    name: '2001: a space odyssey',
+    color: '#12d',
     hint: 'i\'m afraid i can\'t do that, dave',
+    name: '2001: a space odyssey',
     // 5 notes
     song: [
       { key:  9, hold: 12,   next: 2000 },  // this is larger than BASE_RADIUS
@@ -39,10 +40,12 @@ const PLANETS = [
       { key: 25, hold:  3.5, next:  250 },
       { key: 24, hold:  8,   next: 3000 }
     ],
+    width: 3, // x base radius
   },
   {
-    name: 'the force theme',
+    color: '#c12',
     hint: 'may it be with you, always',
+    name: 'the force theme',
     // 7 notes
     song: [
       { key: 12, hold: 3.5, next:  350 },
@@ -53,6 +56,7 @@ const PLANETS = [
       { key: 20, hold: 8,   next:  800 },
       { key: 12, hold: 8,   next: 2000 }
     ],
+    width: 2.2, // x base radius
   },
   // Lost in space (7 notes)
   // https://www.youtube.com/watch?v=--5Z-gwwzzw
@@ -61,8 +65,9 @@ const PLANETS = [
   //   keys: 11,16,21,20,16,13,18,23
   // ],
   {
-    name: 'darth vader theme',
+    color: '#2b1',
     hint: 'he is your father',
+    name: 'darth vader theme',
     // 9 notes
     song: [
       { key:  4, hold: 8,   next: 1000 },
@@ -74,7 +79,8 @@ const PLANETS = [
       { key:  0, hold: 8,   next:  800 },
       { key:  7, hold: 5,   next:  350 },
       { key:  4, hold: 3.5, next: 2000 }
-    ]
+    ],
+    width: 1.7, // x base radius
   }
 ];
 
@@ -95,12 +101,14 @@ let wellPlacedNotes;
 
 // visible canvas (size will be readjusted on load and on resize)
 const [CTX] = createCanvas(768, 1024, c);
-// full map, rendered off screen
-const [MAP_CTX, MAP] = createCanvas(480, 640);
+// starfield, rendered off screen
+const [STARS_CTX, STARS] = createCanvas(480, 640);
+// planet, rendered off screen
+const [PLANET_CTX, PLANET] = createCanvas(200, 200);
 // visible portion of the map, seen from camera
 const [VIEWPORT_CTX, VIEWPORT] = createCanvas(480, 640);
 
-
+let svgPattern;
 let canvasX;
 let scaleToFit;
 
@@ -122,10 +130,10 @@ const ringColor = note => `hsl(${note.hue} ${note.hover && crosshair.touchTime ?
 const trailColor = note => `hsl(${note.hue} 40% ${note.hover && crosshair.touchTime ? 90 : 15}%)`;
 
 function initTitleScreen() {
-  renderMap();
+  renderStars();
+  renderPlanet();
   currentSong = PLANETS[s].song.map(note => ({...note}));
   moveRing(3, 4);
-  planet.width = 2; // number of BASE_RADIUS
   planet.x = VIEWPORT.width;
   planet.y = VIEWPORT.height;
   updateNotesDisplayAttributes();
@@ -149,10 +157,7 @@ function startGame() {
 function startPuzzle(s) {
   crosshair.enabled = true;
 
-  // TODO pull this out of PLANETS
-  // planet.width = 2; // number of BASE_RADIUS
-  // planet.x = VIEWPORT.width - (2+planet.width)*BASE_RADIUS;
-  // planet.y = VIEWPORT.height - (2+planet.width)*BASE_RADIUS;
+  // HACK: notes will be used as entities
 
   // clone the current song, that can altered at will without damaging the original template
   currentSong = PLANETS[s].song.map(note => ({...note}));
@@ -166,7 +171,7 @@ function startPuzzle(s) {
 
   updateNotesDisplayAttributes();
 
-  // HACK: notes will be used as entities
+  renderPlanet();
 
   playSong(currentSong);     
 };
@@ -198,7 +203,7 @@ function updateNotesDisplayAttributes() {
 
       return note.radius;
     },
-    (2+planet.width)*BASE_RADIUS
+    (2+PLANETS[s].width)*BASE_RADIUS
   );
 }
 
@@ -315,10 +320,14 @@ const SPACE = 2*CHARSET_SIZE;
 
 function render() {
   VIEWPORT_CTX.drawImage(
-    MAP,
-    // adjust x/y offset
+    STARS,
     0, 0, VIEWPORT.width, VIEWPORT.height,
     0, 0, VIEWPORT.width, VIEWPORT.height
+  );
+  VIEWPORT_CTX.drawImage(
+    PLANET,
+    0, 0, PLANET.width, PLANET.height,
+    VIEWPORT.width - PLANET.width, VIEWPORT.height - PLANET.height, PLANET.width, PLANET.height,
   );
   
   switch (screen) {
@@ -457,11 +466,34 @@ function renderDraggedRing(note) {
   VIEWPORT_CTX.restore();
 };
 
-function renderMap() {
-  MAP_CTX.fillStyle = '#000';
-  MAP_CTX.fillRect(0, 0, MAP.width, MAP.height);
-  // TODO render star field
+function renderStars() {
+  STARS_CTX.fillStyle = '#000';
+  STARS_CTX.fillRect(0, 0, STARS.width, STARS.height);
+  let prob = 0;
+  for (let x = 0; x < STARS.width; x += 10) {
+    for (let y = 0; y < STARS.height; y += 10) {
+      if (rand() < prob) {
+        prob = 0;
+        STARS_CTX.fillStyle = choice(['#444', '#555', '#666']);
+        const size = randInt(1, 2);
+        STARS_CTX.fillRect(x, y, size, size);
+      } else {
+        prob += 0.002;
+      }
+    }
+  }
 };
+
+function renderPlanet() {
+
+  PLANET_CTX.clearRect(0, 0, PLANET.width, PLANET.height);
+
+  PLANET_CTX.fillStyle = PLANET_CTX.createPattern(svgPattern, 'repeat');
+  PLANET_CTX.beginPath();
+  PLANET_CTX.arc(PLANET.width, PLANET.height, PLANETS[s].width * BASE_RADIUS, 0, 2*Math.PI);
+  PLANET_CTX.fill();
+  PLANET_CTX.closePath();
+}
 
 
 // LOOP HANDLERS
@@ -499,6 +531,8 @@ onload = async (e) => {
   checkMonetization();
 
   await initCharset(VIEWPORT_CTX);
+  svgPattern = await loadImg('data:image/svg+xml;base64,'+btoa(new XMLSerializer().serializeToString(p)));
+
   initAudio(PLANETS.map(planet => planet.song));
   initTitleScreen();
 
@@ -511,7 +545,7 @@ onresize = onrotate = function() {
   c.width = VIEWPORT.width * scaleToFit;
   c.height = VIEWPORT.height * scaleToFit;
   // disable smoothing on image scaling
-  CTX.imageSmoothingEnabled = VIEWPORT_CTX.imageSmoothingEnabled = MAP_CTX.imageSmoothingEnabled = false;
+  CTX.imageSmoothingEnabled = VIEWPORT_CTX.imageSmoothingEnabled = STARS_CTX.imageSmoothingEnabled = PLANET_CTX.imageSmoothingEnabled = false;
 
   canvasX = (window.innerWidth - c.width) / 2;
   // fix key events not received on itch.io when game loads in full screen
