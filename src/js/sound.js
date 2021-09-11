@@ -59,6 +59,14 @@ export function stopSong(song) {
   });
 }
 
+export function pauseSong() {
+  audioCtx.forEach(ctx => ctx.suspend());
+}
+
+export function resumeSong() {
+  audioCtx.forEach(ctx => ctx.resume());
+}
+
 export function generateBufferDataForNote(note) {
   note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
   note.buffer.getChannelData(0).set(getD(note.key, note.hold));

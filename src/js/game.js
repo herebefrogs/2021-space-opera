@@ -1,6 +1,6 @@
 import { isMobile } from './mobile';
 import { checkMonetization, isMonetizationEnabled } from './monetization';
-import { initAudio, generateBufferDataForNote, playSong, stopSong } from './sound';
+import { initAudio, generateBufferDataForNote, pauseSong, playSong, resumeSong, stopSong } from './sound';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText, renderBitmapText } from './text';
 import { choice, clamp, getRandSeed, setRandSeed, lerp, loadImg, rand, randInt } from './utils';
@@ -514,10 +514,10 @@ function toggleLoop(value) {
   if (running) {
     lastTime = performance.now();
     loop();
-    // TODO resume music
+    resumeSong();
   } else {
     cancelAnimationFrame(requestId);
-    // TODO pause music
+    pauseSong();
   }
 };
 
