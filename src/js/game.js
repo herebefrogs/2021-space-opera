@@ -81,9 +81,9 @@ const PLANETS = [
 const DISTANCE_TO_TARGET_RANGE = 5; // click/touch tolerance in pixel between crosshair and ring
 // NOTE: must always be larger than hold+next/100
 const BASE_RADIUS = 35; // in pixel, inner space for planet
-const HUE_HOVER = 300;  // Purple HSL hue in degree, when crosshair over a ring
 let s = 0;            // current song index
-var currentSong = []; // current song data
+let currentSong = []; // current song data
+let draggedNote;
 
 
 const planet = {};
@@ -352,7 +352,9 @@ function render() {
       break;
     case GAME_SCREEN:
       currentSong.forEach(renderRing);
-      renderDraggedRing(currentSong.find(note => note.dragged));
+      if (draggedNote) {
+        renderDraggedRing(draggedNote);
+      }
 
       // HUD
       renderBitmapText(
@@ -441,20 +443,18 @@ function renderRing(note) {
 }
 
 function renderDraggedRing(note) {
-  if (note) {
-    VIEWPORT_CTX.save();
+  VIEWPORT_CTX.save();
+
+  VIEWPORT_CTX.beginPath();
+  VIEWPORT_CTX.shadowBlur = 5;
+  VIEWPORT_CTX.lineWidth = note.width;
+  VIEWPORT_CTX.arc(planet.x, planet.y, crosshairDistanceFromPlanet() - note.width/2, 0, 2 * Math.PI);
+  VIEWPORT_CTX.strokeStyle = ringColor(note);
+  VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
+  VIEWPORT_CTX.stroke();
+  VIEWPORT_CTX.closePath();
   
-    VIEWPORT_CTX.beginPath();
-    VIEWPORT_CTX.shadowBlur = 5;
-    VIEWPORT_CTX.lineWidth = note.width;
-    VIEWPORT_CTX.arc(planet.x, planet.y, crosshairDistanceFromPlanet() - note.width/2, 0, 2 * Math.PI);
-    VIEWPORT_CTX.strokeStyle = ringColor(note);
-    VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
-    VIEWPORT_CTX.stroke();
-    VIEWPORT_CTX.closePath();
-    
-    VIEWPORT_CTX.restore();
-  }
+  VIEWPORT_CTX.restore();
 };
 
 function renderMap() {
@@ -577,6 +577,7 @@ onpointerdown = function(e) {
       if (n >= 0) {
         b.style.cursor = 'grabbing';
         currentSong[n].dragged = crosshair.touchTime;
+        draggedNote = currentSong[n];
       }
       break;
   }
@@ -607,6 +608,7 @@ onpointerup = function(e) {
       const src = currentSong.findIndex(note => note.dragged);
       if (src >= 0) {
         currentSong[src].dragged = 0;
+        draggedNote = 0;
 
         const dest = ringUnderCrosshair();
         if (dest >= 0) {
