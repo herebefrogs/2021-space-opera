@@ -16,16 +16,16 @@ Getting Started
 
 Goal
 -----
-Space no longer sounds its old self. Bring harmony to the Cosmic Microwave Background by solving each planet's musical puzzle.
+Space no longer sounds its old self... Bring harmony to the Cosmic Microwave Background by solving each planet's musical puzzle!
 
 Each planet has an iconic space tune. Each ring of the planet is a note of the tune. Unfortunately, each tune was scrambled. Recompose the tune by swapping rings 2 by 2.
 
-Wider rings means longer notes. Colder ring colors means lower notes, while warmer colored rings means higher notes.
+Wider rings mean longer notes. Colder ring colors mean lower notes, while warmer ring colors mean higher notes.
 A hint will help you guess the tune of each planet.
 
 Controls
 --------
-Drag and drop rings to another position with mouse clicks (desktop) or tap (mobile)
+Drag and drop rings with mouse clicks (desktop) or tap (mobile). Rings will light up when they can be dropped.
 
 Web Monetization
 ----------------
