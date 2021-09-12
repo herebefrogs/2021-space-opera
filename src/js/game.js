@@ -258,7 +258,7 @@ function moveRing(src, dest) {
 const crosshairDistanceFromPlanet = () => Math.sqrt(Math.pow(planet.x - crosshair.x, 2) + Math.pow(planet.y - crosshair.y, 2));
 
 const ringUnderCrosshair = () => currentSong.findIndex(
-  note => crosshair.enabled && Math.abs(note.radius - note.width/2 - crosshairDistanceFromPlanet()) <= Math.max(note.width/2, DISTANCE_TO_TARGET_RANGE)
+  note => crosshair.enabled && Math.abs(note.radius - (isMobile ? BASE_RADIUS : note.width)/2 - crosshairDistanceFromPlanet()) <= Math.max((isMobile ? BASE_RADIUS : note.width)/2, DISTANCE_TO_TARGET_RANGE)
 );
 
 function update() {
@@ -352,7 +352,7 @@ function render() {
         SPACE, 22*SPACE, ALIGN_LEFT, 2);
 
       renderBitmapText(
-        'click/tap to start',
+        `${isMobile ? 'tap' : 'click'} to start`,
         VIEWPORT.width / 2, 34*SPACE, ALIGN_CENTER, 2);
 
       renderBitmapText(
@@ -430,6 +430,7 @@ function renderRing(note) {
   
     // trail (not sure if keeping it)
     VIEWPORT_CTX.beginPath();
+    VIEWPORT_CTX.shadowBlur = Math.max(10, note.width);
     VIEWPORT_CTX.lineWidth = BASE_RADIUS - note.width;
     VIEWPORT_CTX.arc(planet.x, planet.y, note.radius - note.width - VIEWPORT_CTX.lineWidth/2, 0, 2 * Math.PI);
     VIEWPORT_CTX.strokeStyle = trailColor(note);

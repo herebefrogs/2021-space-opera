@@ -46,7 +46,7 @@ game feature
 [saturday]
 - mobile bugs
   - [x] coordinates seem to be off
-  - rings are too small (hover the whole ring+trail if mobile?)
+  - [x] rings are too small (hover the whole ring+trail if mobile?)
 - tunes
     - star trek theme (short/easy)
     - star trek TNG theme?
