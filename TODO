@@ -71,6 +71,7 @@ game feature
 - [x] restart / title screen
 - [x] stop/resume music on tab change
 [sunday]
+- [x] animated loading screen, as the more songs I added, the longer it took to generate their audio data on startup
 - screenshots
 - [x] update README & repo
 - submit

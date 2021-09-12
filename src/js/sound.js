@@ -12,19 +12,12 @@ let timerId;
 
 // public interface
 
-export function initAudio(songs) {
+export function initAudioContext(songs) {
   start = performance.now();
   for (i=0; i<NB_AUDIO_CTX; i++) {
     audioCtx[i]= new AudioContext;
   }
-  context = performance.now();
-
-  songs.forEach(song => {
-    generateBufferDataForSong(song)
-  });
   end = performance.now();
-
- console.log('audio contexts: ' + (context-start)/1000 + 's', '\nsongs buffers:  ' + (end - context)/1000 + 's', '\ntotal time:     ' + (end - start)/ 1000 + 's')
 }
 
 
@@ -67,16 +60,16 @@ export function resumeSong() {
   audioCtx.forEach(ctx => ctx.resume());
 }
 
-export function generateBufferDataForNote(note) {
-  note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
-  note.buffer.getChannelData(0).set(getD(note.key, note.hold));
+// add an audio buffer to each note of the song, matching the note parameters
+export function generateBufferDataForSong(songData) {
+  songData.forEach(generateBufferDataForNote);
 }
 
 // private implementation
 
-// add an audio buffer to each note of the song, matching the note parameters
-function generateBufferDataForSong(songData) {
-  songData.forEach(generateBufferDataForNote);
+function generateBufferDataForNote(note) {
+  note.buffer = audioCtx[0].createBuffer(1, 1e6, 44100);
+  note.buffer.getChannelData(0).set(getD(note.key, note.hold));
 }
 
 function playNote(note, n) {

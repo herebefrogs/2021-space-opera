@@ -1,6 +1,6 @@
 import { isMobile } from './mobile';
 import { checkMonetization, isMonetizationEnabled } from './monetization';
-import { initAudio, generateBufferDataForNote, pauseSong, playSong, resumeSong, stopSong } from './sound';
+import { initAudioContext, generateBufferDataForSong, pauseSong, playSong, resumeSong, stopSong } from './sound';
 import { save, load } from './storage';
 import { ALIGN_LEFT, ALIGN_CENTER, ALIGN_RIGHT, CHARSET_SIZE, initCharset, renderText, renderBitmapText } from './text';
 import { choice, clamp, getRandSeed, setRandSeed, lerp, loadImg, rand, randInt } from './utils';
@@ -8,10 +8,11 @@ import { choice, clamp, getRandSeed, setRandSeed, lerp, loadImg, rand, randInt }
 
 // GAMEPLAY VARIABLES
 
-const TITLE_SCREEN = 0;
-const GAME_SCREEN = 1;
-const END_SCREEN = 2;
-let screen = TITLE_SCREEN;
+const LOADING_SCREEN = 0;
+const TITLE_SCREEN = 1;
+const GAME_SCREEN = 2;
+const END_SCREEN = 3;
+let screen = LOADING_SCREEN;
 
 
 const PLANETS = [
@@ -162,7 +163,7 @@ const BASE_RADIUS = 35; // in pixel, inner space for planet
 let s = 0;            // current song index
 let currentSong = []; // current song data
 let draggedNote;
-
+let loadedSongs = 0;
 
 const planet = {};
 let crosshair; // coordinate in viewport space (add viewportOffset to convert to map space)
@@ -202,7 +203,6 @@ const ringColor = note => `hsl(${note.hue} ${note.hover && crosshair.touchTime ?
 const trailColor = note => `hsl(${note.hue} 40% ${note.hover && crosshair.touchTime ? 90 : 15}%)`;
 
 function initTitleScreen() {
-  renderStars();
   renderPlanet();
   currentSong = PLANETS[s].song.map(note => ({...note}));
   moveRing(3, 4);
@@ -338,6 +338,16 @@ const ringUnderCrosshair = () => currentSong.findIndex(
 
 function update() {
   switch (screen) {
+    case LOADING_SCREEN:
+      if (loadedSongs !== PLANETS.length) {
+        // load songs one at the time, to be able to update/render the loading progress message
+        generateBufferDataForSong(PLANETS[loadedSongs].song);
+        loadedSongs += 1;
+      } else {
+        initTitleScreen();
+        screen = TITLE_SCREEN;
+      }
+      break;
     case GAME_SCREEN:
       currentSong.forEach(note => { note.hover = 0 });
 
@@ -406,6 +416,11 @@ function render() {
   );
   
   switch (screen) {
+    case LOADING_SCREEN:
+      renderBitmapText(
+        `loading song #${loadedSongs}/${PLANETS.length}...`,
+        VIEWPORT.width / 2, 34*SPACE, ALIGN_CENTER, 2);
+      break;
     case TITLE_SCREEN:
       currentSong.forEach(renderRing);
 
@@ -623,8 +638,9 @@ onload = async (e) => {
   await initCharset(VIEWPORT_CTX);
   svgPattern = await loadImg('data:image/svg+xml;base64,'+btoa(new XMLSerializer().serializeToString(p)));
 
-  initAudio(PLANETS.map(planet => planet.song));
-  initTitleScreen();
+  initAudioContext();
+  // to avoid the loading counter increase to render on top of previous values
+  renderStars();
 
   toggleLoop(true);
 };
