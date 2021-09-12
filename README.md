@@ -1,7 +1,7 @@
 2021: a Space Odyssey
 ========
 
-My game entry for JS13K Games 2021on the theme "Space".
+My game entry for JS13K Games 2021 on the theme "Space".
 
 ![2021: a Space Opera title screen](./2021_space_opera.png)
 
@@ -16,7 +16,12 @@ Getting Started
 
 Goal
 -----
-Space no longer sounds its old self. Bring harmony to the Cosmic Microwave Background by re-arranging each planet rings to discover their iconic space tune.
+Space no longer sounds its old self. Bring harmony to the Cosmic Microwave Background by solving each planet's musical puzzle.
+
+Each planet has an iconic space tune. Each ring of the planet is a note of the tune. Unfortunately, each tune was scrambled. Recompose the tune by swapping rings 2 by 2.
+
+Wider rings means longer notes. Colder ring colors means lower notes, while warmer colored rings means higher notes.
+A hint will help you guess the tune of each planet.
 
 Controls
 --------
@@ -40,3 +45,4 @@ Special Thanks & Credits
 - [Frank Force](https://twitter.com/KilledByAPixel) and [Keith Clark](https://keithclark.co.uk/) for their über smoll sound & music players, [ZzFX](https://github.com/KilledByAPixel/ZzFX) and [ZzFX Music](https://github.com/keithclark/ZzFXM) respectively
 - [Steven Lambert](https://twitter.com/StevenKLambert) for his Pseudo Random Number Generator from Kontra.js
 - Matt Deslaurier for [canvas-sketch-util](https://github.com/mattdesl/canvas-sketch-util)'s lerp functions
+- [Maxime Euziere](https://twitter.com/MaximeEuziere) again for his [miniPiano](https://github.com/xem/miniPiano) tool, and [Crystal Parker](https://twitter.com/vertfromageio) for annotating his code so it could be easily integrated in my game.
