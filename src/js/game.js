@@ -211,7 +211,10 @@ function updateWellPlacedNotes() {
   const templateSong = PLANETS[s].song;
   // count how many notes have the same key/hold/next values than their counterpart in the template song
   wellPlacedNotes = currentSong.reduce(
-    (sum, note, n) => sum + (note.key === templateSong[n].key && note.hold === templateSong[n].hold && note.next === templateSong[n].next ? 1 : 0),
+    (sum, note, n) => {
+      note.correctPlace = note.key === templateSong[n].key && note.hold === templateSong[n].hold && note.next === templateSong[n].next;
+      return sum + (note.correctPlace ? 1 : 0);
+    },
     0
   );
 }
@@ -367,13 +370,19 @@ function render() {
 
       // HUD
       renderBitmapText(
-        `planets: ${s + 1}/${PLANETS.length}`,
+        `planet #${s + 1}/${PLANETS.length}`,
         SPACE, SPACE, ALIGN_LEFT, 2
       );
       renderBitmapText(
-        `notes: ${wellPlacedNotes}/${currentSong.length}`,
+        `${wellPlacedNotes}/${currentSong.length}\nnotes`,
         VIEWPORT.width - SPACE, VIEWPORT.height - 2*SPACE, ALIGN_RIGHT, 2
       );
+      if (isMonetizationEnabled()) {
+        renderBitmapText(
+          `coil exclusive`,
+          SPACE, VIEWPORT.height - 4*SPACE, ALIGN_LEFT, 2
+        );
+      }
 
       if (crosshair.enabled) {
         if (s === 0) {
@@ -447,6 +456,14 @@ function renderRing(note) {
     VIEWPORT_CTX.shadowColor = VIEWPORT_CTX.strokeStyle;
     VIEWPORT_CTX.stroke();
     VIEWPORT_CTX.closePath();
+
+    if (isMonetizationEnabled() && screen === GAME_SCREEN) {
+      // render a sign that the note is correctly placed
+      renderBitmapText(
+        note.correctPlace ? 'C' : 'x',
+        VIEWPORT.width - note.radius + note.width / 2, VIEWPORT.height - 4*CHARSET_SIZE, ALIGN_CENTER, 2
+      )
+    }
     
     VIEWPORT_CTX.restore();
   }

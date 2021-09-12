@@ -3,6 +3,8 @@
 
 My game entry for JS13K Games 2021on the theme "Space".
 
+![2021: a Space Opera title screen](./2021_space_opera.png)
+
 Getting Started
 ---------------
 
@@ -12,19 +14,19 @@ Getting Started
 
 3. Run `npm run build` to build an optimized version of the game, packaged for JS13KGAMES submission.
 
-Goal:
+Goal
 -----
-Space does not sound its old self. Bring harmony to the Cosmic Microwave Background by re-arranging each planet rings to discover their iconic space tune.
+Space no longer sounds its old self. Bring harmony to the Cosmic Microwave Background by re-arranging each planet rings to discover their iconic space tune.
 
 Controls
 --------
-
 Drag and drop rings to another position with mouse clicks (desktop) or tap (mobile)
 
 Web Monetization
 ----------------
+Coil subscribers get exclusive markers under each ring indicating if notes are correctly placed or not.
 
-Hints?
+![Coil exclusive markers](./coil_markers.png)
 
 
 Special Thanks & Credits
