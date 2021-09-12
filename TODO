@@ -47,12 +47,12 @@ game feature
   - [x] coordinates seem to be off
   - [x] rings are too small (hover the whole ring+trail if mobile?)
 - tunes
-    - star trek theme (short/easy)
-    - star trek TNG theme?
-    - lost in Space
-    - battle star galactica
+    - [x] star trek theme (short/easy)
+    - [x] star trek TNG theme?
+    - [x] lost in Space
+    - [x] battle star galactica
     - alien
-    - galaxy quest
+    - [x] galaxy quest
     - david bowie space oddity
     - https://vertfromage.github.io/miniPiano/pianoPlayback.html
 - [x] coil

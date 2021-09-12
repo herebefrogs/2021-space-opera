@@ -29,12 +29,11 @@ const PLANETS = [
   // }
 
   {
-    color: '#12d',
     hint: 'i\'m afraid i can\'t do that, dave',
     name: '2001: a space odyssey',
     // 5 notes
     song: [
-      { key:  9, hold: 12,   next: 2000 },  // this is larger than BASE_RADIUS
+      { key:  9, hold: 12,   next: 2000 },
       { key: 16, hold: 12,   next: 2000 },
       { key: 21, hold: 12,   next: 2000 },
       { key: 25, hold:  3.5, next:  250 },
@@ -43,7 +42,6 @@ const PLANETS = [
     width: 3, // x base radius
   },
   {
-    color: '#c12',
     hint: 'may it be with you, always',
     name: 'the force theme',
     // 7 notes
@@ -58,14 +56,88 @@ const PLANETS = [
     ],
     width: 2.2, // x base radius
   },
-  // Lost in space (7 notes)
-  // https://www.youtube.com/watch?v=--5Z-gwwzzw
-  // Star Trek theme (8 notes)
-  // [
-  //   keys: 11,16,21,20,16,13,18,23
-  // ],
   {
-    color: '#2b1',
+    hint: 'make it so',
+    name: 'star trek next generation',
+    // 7 notes
+    song: [
+      { key:  9, hold: 8,   next: 1000 },
+      { key: 14, hold: 3.5, next:  350 },
+      { key: 18, hold: 3.5, next:  350 },
+      { key: 16, hold: 5,   next:  800 },
+      { key: 12, hold: 3.5, next:  350 },
+      { key: 23, hold: 3.5, next:  350 },
+      { key: 21, hold: 8,   next: 2000 }
+    ],
+    width: 2.2, // x base radius
+  },
+  {
+    hint: 'danger will robinson',
+    name: 'lost in space',
+    // 8 notes
+    song: [
+      { key: 19, hold: 5,   next: 1000 },
+      { key: 19, hold: 2.5, next:  250 },
+      { key: 18, hold: 2.5, next:  250 },
+      { key: 19, hold: 2.5, next:  250 },
+      { key: 14, hold: 3.5, next:  350 },
+      { key: 11, hold: 3.5, next:  350 },
+      { key:  7, hold: 3.5, next:  350 },
+      { key: 19, hold: 8,   next: 2000 },
+    ],
+    width: 2, // x base radius
+  },
+  {
+    hint: 'to boldly go in space',
+    name: 'star trek original series',
+    // 8 notes
+    song: [
+      { key: 11, hold: 3.5, next:  350 },
+      { key: 16, hold: 2.5, next:  250 },
+      { key: 21, hold: 8,   next: 1000 },
+      { key: 20, hold: 3.5, next:  350 },
+      { key: 16, hold: 3.5, next:  350 },
+      { key: 13, hold: 3.5, next:  350 },
+      { key: 18, hold: 3.5, next:  350 },
+      { key: 23, hold: 8,   next: 2000 }
+    ],
+    width: 2, // x base radius
+  },
+  {
+    hint: 'so say we all',
+    name: 'battle star galactica',
+    // 9 notes
+    song: [
+      { key: 28, hold: 8,   next: 1000 },
+      { key: 26, hold: 3.5, next:  350 },
+      { key: 25, hold: 3.5, next:  350 },
+      { key: 23, hold: 3.5, next:  350 },
+      { key: 21, hold: 3.5, next:  350 },
+      { key: 26, hold: 8,   next: 1000 },
+      { key: 28, hold: 2.5, next:  250 },
+      { key: 30, hold: 2.5, next:  250 },
+      { key: 28, hold: 8,   next: 2000 }
+    ],
+    width: 1.65, // x base radius
+  },
+  {
+    hint: 'never give up, never surrender',
+    name: 'galaxy quest',
+    // 9 notes
+    song: [
+      { key:  7, hold: 5,   next:  800 },
+      { key: 12, hold: 5,   next:  800 },
+      { key: 14, hold: 5,   next:  800 },
+      { key: 16, hold: 2.5, next:  250 },
+      { key: 17, hold: 2.5, next:  250 },
+      { key: 19, hold: 2.5, next:  250 },
+      { key: 17, hold: 5,   next:  800 },
+      { key: 16, hold: 5,   next:  800 },
+      { key: 14, hold: 5,   next: 2000 }
+    ],
+    width: 1.5, // x base radius
+  },
+  {
     hint: 'he is your father',
     name: 'darth vader theme',
     // 9 notes
