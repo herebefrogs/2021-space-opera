@@ -631,10 +631,13 @@ function toggleLoop(value) {
   if (running) {
     lastTime = performance.now();
     loop();
-    resumeSong();
+    // current song not set yet on loading screen
+    if (screen !== LOADING_SCREEN) {
+      playSong(currentSong);
+    }
   } else {
     cancelAnimationFrame(requestId);
-    pauseSong();
+    stopSong(currentSong);
   }
 };
 
