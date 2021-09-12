@@ -54,7 +54,7 @@ const PLANETS = [
       { key: 19, hold: 8,   next: 1000 }, // 19,1000 too close to 20,800, better in dynamic color range
       { key: 20, hold: 2.5, next:  250 },
       { key: 22, hold: 2.5, next:  250 },
-      { key: 20, hold: 2.5, next:  800 },
+      { key: 20, hold: 5,   next:  800 },
       { key: 12, hold: 8,   next: 2000 }
     ],
     width: 2.2, // x base radius
@@ -88,7 +88,7 @@ const PLANETS = [
       { key: 14, hold: 3.5, next:  350 },
       { key: 11, hold: 3.5, next:  350 },
       { key:  7, hold: 3.5, next:  350 },
-      { key: 19, hold: 8,   next: 1000 },
+      { key: 19, hold: 5,   next: 1000 },
     ],
     width: 2, // x base radius
   },
@@ -159,7 +159,7 @@ const PLANETS = [
       { key:  4, hold: 8,   next: 1000 },
       { key:  0, hold: 8,   next:  800 },
       { key:  7, hold: 5,   next:  350 },
-      { key:  4, hold: 8,   next: 2000 }
+      { key:  4, hold: 8,   next: 1000 }
     ],
     width: 1.7, // x base radius
   }
