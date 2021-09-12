@@ -72,6 +72,10 @@ game feature
 - [x] stop/resume music on tab change
 [sunday]
 - [x] animated loading screen, as the more songs I added, the longer it took to generate their audio data on startup
+- some notes too similar to get right
+  - dynamic color range based on highest/lowest keys in the tune, vs static across all tunes. (bc it's not always possible to tweak hold/next without damaging the tune)
+  - ring gap reflect next (more visually intuitive, but make rings harder to grab and will break a lot of code assumptions)
+- resume music on tab focus play all the missed notes at once, stop/start music instead?
 - screenshots
 - [x] update README & repo
 - submit

@@ -32,6 +32,7 @@ const PLANETS = [
   {
     hint: 'i\'m afraid i can\'t do that, dave',
     name: '2001: a space odyssey',
+    noteRange: [9, 25],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 5 notes
     song: [
       { key:  9, hold: 12,   next: 2000 },
@@ -45,14 +46,15 @@ const PLANETS = [
   {
     hint: 'may it be with you, always',
     name: 'the force theme',
+    noteRange: [12, 22],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 7 notes
     song: [
       { key: 12, hold: 3.5, next:  350 },
       { key: 17, hold: 8,   next: 1000 },
-      { key: 19, hold: 8,   next: 1000 },
+      { key: 19, hold: 8,   next: 1000 }, // 19,1000 too close to 20,800, better in dynamic color range
       { key: 20, hold: 2.5, next:  250 },
       { key: 22, hold: 2.5, next:  250 },
-      { key: 20, hold: 8,   next:  800 },
+      { key: 20, hold: 2.5, next:  800 },
       { key: 12, hold: 8,   next: 2000 }
     ],
     width: 2.2, // x base radius
@@ -60,6 +62,7 @@ const PLANETS = [
   {
     hint: 'make it so',
     name: 'star trek next generation',
+    noteRange: [9, 23],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 7 notes
     song: [
       { key:  9, hold: 8,   next: 1000 },
@@ -75,31 +78,33 @@ const PLANETS = [
   {
     hint: 'danger will robinson',
     name: 'lost in space',
+    noteRange: [7, 19],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 8 notes
     song: [
       { key: 19, hold: 5,   next: 1000 },
       { key: 19, hold: 2.5, next:  250 },
-      { key: 18, hold: 2.5, next:  250 },
+      { key: 18, hold: 2.5, next:  250 },   // 18,250 too close to 19,250, slightly better in dynamic range 
       { key: 19, hold: 2.5, next:  250 },
       { key: 14, hold: 3.5, next:  350 },
       { key: 11, hold: 3.5, next:  350 },
       { key:  7, hold: 3.5, next:  350 },
-      { key: 19, hold: 8,   next: 2000 },
+      { key: 19, hold: 8,   next: 1000 },
     ],
     width: 2, // x base radius
   },
   {
     hint: 'to boldly go in space',
     name: 'star trek original series',
+    noteRange: [11, 23],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 8 notes
     song: [
       { key: 11, hold: 3.5, next:  350 },
       { key: 16, hold: 2.5, next:  250 },
       { key: 21, hold: 8,   next: 1000 },
       { key: 20, hold: 3.5, next:  350 },
-      { key: 16, hold: 3.5, next:  350 },
-      { key: 13, hold: 3.5, next:  350 },
-      { key: 18, hold: 3.5, next:  350 },
+      { key: 16, hold: 2.5, next:  250 },
+      { key: 13, hold: 2.5, next:  250 },
+      { key: 18, hold: 2.5, next:  250 },
       { key: 23, hold: 8,   next: 2000 }
     ],
     width: 2, // x base radius
@@ -107,40 +112,43 @@ const PLANETS = [
   {
     hint: 'so say we all',
     name: 'battle star galactica',
+    noteRange: [21, 30],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 9 notes
-    song: [
+    song: [                                 // rythm could be faster and maybe help with the notes closeness
       { key: 28, hold: 8,   next: 1000 },
       { key: 26, hold: 3.5, next:  350 },
-      { key: 25, hold: 3.5, next:  350 },
+      { key: 25, hold: 3.5, next:  350 },   //25,350 too close to 26,350, no improvement with dynamic color range
       { key: 23, hold: 3.5, next:  350 },
       { key: 21, hold: 3.5, next:  350 },
       { key: 26, hold: 8,   next: 1000 },
       { key: 28, hold: 2.5, next:  250 },
       { key: 30, hold: 2.5, next:  250 },
-      { key: 28, hold: 8,   next: 2000 }
+      { key: 28, hold: 8,   next: 1000 }
     ],
     width: 1.65, // x base radius
   },
   {
     hint: 'never give up, never surrender',
     name: 'galaxy quest',
+    noteRange: [7, 19],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 9 notes
     song: [
       { key:  7, hold: 5,   next:  800 },
       { key: 12, hold: 5,   next:  800 },
       { key: 14, hold: 5,   next:  800 },
       { key: 16, hold: 2.5, next:  250 },
-      { key: 17, hold: 2.5, next:  250 },
+      { key: 17, hold: 2.5, next:  250 },   // 16,250 too close 17,250, better with dynamic range
       { key: 19, hold: 2.5, next:  250 },
       { key: 17, hold: 5,   next:  800 },
-      { key: 16, hold: 5,   next:  800 },
-      { key: 14, hold: 5,   next: 2000 }
+      { key: 16, hold: 5,   next:  800 },   // 17,800 too close 16,800, better with dynamic range
+      { key: 14, hold: 8,   next: 2000 }
     ],
     width: 1.5, // x base radius
   },
   {
     hint: 'he is your father',
     name: 'darth vader theme',
+    noteRange: [0, 7],  // lowest & highest keys, use to make ring colors more distinct for adjacent keys
     // 9 notes
     song: [
       { key:  4, hold: 8,   next: 1000 },
@@ -151,7 +159,7 @@ const PLANETS = [
       { key:  4, hold: 8,   next: 1000 },
       { key:  0, hold: 8,   next:  800 },
       { key:  7, hold: 5,   next:  350 },
-      { key:  4, hold: 3.5, next: 2000 }
+      { key:  4, hold: 8,   next: 2000 }
     ],
     width: 1.7, // x base radius
   }
@@ -196,8 +204,12 @@ let running = true;
 
 // GAMEPLAY HANDLERS
 
-// map piano key [0-35] to hue [225(blue/cold) > 120 (green) > 0 (red/warm) > 270 (violet/hot)] in degree
-const keyToHue = key => ((360 - key*10) + 225)%360;
+// map piano key [0-35] to HSV hue component
+// key first mapped to note range for the current tune [0 - 35] -> [low - high]
+// then to hue in degree (leaving out 240(blue) to 360(red)) [low - high] -> [0 - 240]
+// then shifted by 240 degree [0 - 240] -> [240 - 0]
+// so the lowest key maps to blue(cold) and highest key maps to violet(not) with green/yellow/orange/red in between
+const keyToHue = (key, [low, high]) => (360 - ((key - low)*240/(high-low)) + 240)%360;
 
 const ringColor = note => `hsl(${note.hue} ${note.hover && crosshair.touchTime ? 10 : 90}% ${note.hover && crosshair.touchTime ? 90 : lerp(90, 50, (currentTime - note.startTime)/(note.hold*500))}%)`;
 const trailColor = note => `hsl(${note.hue} 40% ${note.hover && crosshair.touchTime ? 90 : 15}%)`;
@@ -268,7 +280,7 @@ function updateNotesDisplayAttributes() {
   currentSong.reduceRight(
     (currentRadius, note) => {
       // set some rendering
-      note.hue = keyToHue(note.key);
+      note.hue = keyToHue(note.key, PLANETS[s].noteRange);
       note.radius = currentRadius + BASE_RADIUS;
       note.width = note.next/100;
       note.startTime = 0;
