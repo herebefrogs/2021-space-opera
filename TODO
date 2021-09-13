@@ -17,8 +17,8 @@ game feature
     - [x] if notes matches, move on to next puzzle
 [tuesday]
   - [x] nicer UI to render rings
-    - planets
-    - star field
+    - [x] planets
+    - [x] star field
   - [x] ask for feedback
 [wednesday/thursday]
 - puzzles
@@ -76,10 +76,19 @@ game feature
   - [x] dynamic color range based on highest/lowest keys in the tune, vs static across all tunes. (bc it's not always possible to tweak hold/next without damaging the tune)
   - ring gap reflect next (more visually intuitive, but make rings harder to grab and will break a lot of code assumptions)
 - [x] resume music on tab focus play all the missed notes at once, stop/start music instead?
-- screenshots
+- [x] screenshots
 - [x] update README & repo
-- submit
+- [x] submit
 
+[post competition]
+- bugs
+  - fix planet not loading on Firefox
+  - static noise during song in Firefox
+    - optimize calculations in variables as much as possible to avoid repeats?
+    - get logic off the pointer event loop
+- end screen
+  - tweet number of ring moved to win game
+- animate a transition from one planet to another (with canvas translate and lerp)
 
 
 https://shrinkme.app/?s=e <- optimize SVG paths even further

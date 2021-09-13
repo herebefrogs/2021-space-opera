@@ -607,6 +607,8 @@ function renderPlanet() {
 
   PLANET_CTX.fillStyle = PLANET_CTX.createPattern(svgPattern, 'repeat');
   PLANET_CTX.beginPath();
+  PLANET_CTX.shadowBlur = BASE_RADIUS;
+  PLANET_CTX.shadowColor = '#1cb'
   PLANET_CTX.arc(PLANET.width, PLANET.height, PLANETS[s].width * BASE_RADIUS, 0, 2*Math.PI);
   PLANET_CTX.fill();
   PLANET_CTX.closePath();
