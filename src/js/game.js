@@ -524,7 +524,7 @@ function render() {
         'thank you for playing',
         VIEWPORT.width/2, 28*SPACE, ALIGN_CENTER, 2);
       renderBitmapText(
-        '2001: a space opera',
+        '2021: a space opera',
         VIEWPORT.width/2, 32*SPACE, ALIGN_CENTER, 4);
       break;
   }
